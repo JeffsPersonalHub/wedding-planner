@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A &amp; J — Wedding Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --cream:#F4F9FC;
+    --cream-deep:#E4F1FA;
+    --ink:#3D4F63;
+    --ink-soft:#85A0B6;
+    --sage:#79B4DD;
+    --sage-deep:#4D86B8;
+    --blush:#F6D0E0;
+    --blush-deep:#E090B5;
+    --gold:#FFE7A8;
+    --line:#D8EAF7;
+    --white:#FFFFFF;
+    --radius:10px;
+    --shadow: 0 4px 18px rgba(77,134,184,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Jost',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  h1,h2,h3,.display{font-family:'Cormorant Garamond',serif;}
+
+  /* ===== Lock screen ===== */
+  .lock-screen{
+    position:fixed; inset:0; z-index:200;
+    background:linear-gradient(180deg, var(--sage) 0%, var(--sage-deep) 100%);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .lock-box{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:var(--radius);
+    padding:32px 28px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+    color:var(--cream);
+  }
+  .lock-box .eyebrow{
+    letter-spacing:0.35em; text-transform:uppercase; font-size:11px;
+    color:var(--gold); margin-bottom:6px; font-weight:500;
+  }
+  .lock-box h2{
+    margin:0 0 6px; font-size:2rem; font-weight:600;
+  }
+  .lock-box p{
+    margin:0 0 18px; font-size:13px; color:rgba(255,255,255,0.8);
+  }
+  .lock-box input{
+    width:100%; margin-bottom:12px; text-align:center;
+    border-radius:8px; border:1px solid rgba(255,255,255,0.3);
+    background:rgba(255,255,255,0.95);
+  }
+  .lock-box .btn{ width:100%; }
+  .lock-error{
+    margin-top:12px; font-size:12px; color:#FBD2CC; min-height:16px;
+  }
+
+  /* ===== Sync status badge ===== */
+  .sync-status{
+    position:absolute;
+    top:10px; right:14px;
+    font-size:10px;
+    letter-spacing:0.06em;
+    color:rgba(255,255,255,0.75);
+    z-index:2;
+    text-align:right;
+    max-width:160px;
+  }
+  .sync-status.synced{color:#CFE8C8;}
+  .sync-status.saving{color:var(--gold);}
+  .sync-status.offline{color:#F3C7C0;}
+  .sync-status.unconfigured{color:rgba(255,255,255,0.55);}
+
+  /* ===== Header / Hero ===== */
+  .hero{
+    background:linear-gradient(180deg, var(--sage) 0%, var(--sage-deep) 100%);
+    color:var(--cream);
+    padding:38px 24px 30px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before, .hero::after{
+    content:"";
+    position:absolute;
+    width:240px;height:240px;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:50%;
+    top:-120px; left:-80px;
+  }
+  .hero::after{
+    top:auto; bottom:-140px; right:-100px; left:auto;
+    width:280px;height:280px;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .hero .eyebrow{
+    letter-spacing:0.35em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--gold);
+    margin-bottom:6px;
+    font-weight:500;
+  }
+  .hero h1{
+    font-size:clamp(2.2rem,6vw,3.4rem);
+    font-weight:600;
+    margin:0 0 4px;
+    letter-spacing:0.04em;
+  }
+  .hero h1 span.amp{color:var(--gold); font-style:italic; padding:0 .15em;}
+  .hero .date-line{
+    font-size:14px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.85);
+    margin-bottom:18px;
+  }
+  .countdown{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .countdown .chip{
+    background:rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:var(--radius);
+    padding:10px 18px;
+    min-width:74px;
+  }
+  .countdown .chip .num{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.9rem;
+    font-weight:600;
+    line-height:1;
+    color:var(--white);
+  }
+  .countdown .chip .lbl{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    color:rgba(255,255,255,0.7);
+    margin-top:4px;
+  }
+  .progress-wrap{
+    max-width:420px;
+    margin:0 auto;
+  }
+  .progress-track{
+    height:6px;
+    border-radius:4px;
+    background:rgba(255,255,255,0.18);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--gold);
+    border-radius:4px;
+    transition:width .4s ease;
+  }
+  .progress-label{
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.75);
+    margin-top:8px;
+  }
+
+  /* ===== Tabs ===== */
+  .tabs{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin:22px auto 18px;
+    max-width:480px;
+    padding:0 16px;
+  }
+  .tab-btn{
+    flex:1;
+    background:var(--white);
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:11px 18px;
+    border-radius:999px;
+    font-family:'Jost',sans-serif;
+    font-size:13px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .2s ease;
+    font-weight:500;
+  }
+  .tab-btn.active{
+    background:var(--sage);
+    border-color:var(--sage);
+    color:var(--white);
+  }
+
+  .container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+
+  /* ===== Toolbar ===== */
+  .toolbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin-bottom:16px;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:var(--shadow);
+  }
+  .toolbar .group{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .toolbar label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:var(--ink-soft);
+  }
+  select, input[type=text], input[type=date], textarea{
+    font-family:'Jost',sans-serif;
+    font-size:13px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:var(--white);
+    color:var(--ink);
+    outline:none;
+  }
+  select:focus, input:focus, textarea:focus{
+    border-color:var(--sage);
+  }
+  .btn{
+    font-family:'Jost',sans-serif;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    padding:9px 18px;
+    border-radius:999px;
+    border:1px solid var(--sage);
+    background:var(--sage);
+    color:var(--white);
+    cursor:pointer;
+    transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .btn:hover{background:var(--sage-deep); border-color:var(--sage-deep);}
+  .btn.outline{
+    background:transparent;
+    color:var(--sage-deep);
+  }
+  .btn.outline:hover{background:var(--cream-deep);}
+  .btn.ghost{
+    background:transparent;
+    border-color:var(--line);
+    color:var(--ink-soft);
+  }
+  .btn.ghost:hover{border-color:var(--ink-soft);}
+  .btn.small{padding:5px 12px; font-size:11px;}
+  .btn.danger{border-color:var(--blush-deep); color:var(--blush-deep); background:transparent;}
+  .btn.danger:hover{background:var(--blush-deep); color:var(--white);}
+  .spacer{flex:1;}
+
+  /* ===== Checklist Table ===== */
+  .table-wrap{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow-x:auto;
+    box-shadow:var(--shadow);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    min-width:900px;
+  }
+  thead th{
+    text-align:left;
+    padding:12px 14px;
+    background:var(--cream-deep);
+    color:var(--sage-deep);
+    font-weight:600;
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:0.1em;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+    border-bottom:1px solid var(--line);
+  }
+  thead th .arrow{
+    font-size:10px;
+    margin-left:4px;
+    opacity:0.6;
+  }
+  thead th.no-sort{cursor:default;}
+  tbody td{
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#FCFAF6;}
+  td.desc{max-width:240px; font-weight:500;}
+  td.comments{max-width:200px; color:var(--ink-soft); font-size:12.5px;}
+  td.actions{white-space:nowrap;}
+  .pill{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.04em;
+    white-space:nowrap;
+  }
+  .pill.cat{background:var(--cream-deep); color:var(--sage-deep);}
+  .pill.prio-low{background:#E2F2EA; color:#5C9C7C;}
+  .pill.prio-medium{background:#FFF3D6; color:#C99A3B;}
+  .pill.prio-high{background:#FBE2ED; color:var(--blush-deep);}
+  .pill.status-not-started{background:#EEF3F8; color:var(--ink-soft);}
+  .pill.status-in-progress{background:#DCEEFB; color:var(--sage-deep);}
+  .pill.status-complete{background:#E2F2EA; color:#4F9272;}
+  .empty-row td{
+    text-align:center;
+    color:var(--ink-soft);
+    padding:36px;
+    font-style:italic;
+  }
+
+  /* ===== Calendar ===== */
+  .cal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 16px;
+    box-shadow:var(--shadow);
+  }
+  .cal-header h2{
+    margin:0;
+    font-size:1.6rem;
+    color:var(--sage-deep);
+    min-width:200px;
+    text-align:center;
+  }
+  .cal-nav{display:flex; gap:8px; align-items:center;}
+  .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:8px;
+  }
+  .cal-dow{
+    text-align:center;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:var(--sage-deep);
+    font-weight:600;
+    padding-bottom:6px;
+  }
+  .cal-cell{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:8px;
+    min-height:104px;
+    padding:8px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    min-width:0;
+    overflow:hidden;
+  }
+  .cal-cell.outside{
+    background:var(--cream-deep);
+    opacity:0.55;
+  }
+  .cal-cell.today{
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px var(--gold) inset;
+  }
+  .cal-daynum{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.15rem;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .cal-task{
+    font-size:11px;
+    background:var(--cream-deep);
+    border-left:3px solid var(--sage);
+    border-radius:4px;
+    padding:3px 6px;
+    cursor:pointer;
+    line-height:1.3;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    min-width:0;
+    width:100%;
+    flex-shrink:0;
+  }
+  .cal-task.prio-high{border-left-color:var(--blush-deep);}
+  .cal-task.prio-medium{border-left-color:var(--gold);}
+  .cal-task.status-complete{
+    text-decoration:line-through;
+    opacity:0.55;
+  }
+  .cal-task:hover{background:var(--cream);}
+
+  /* ===== Modal ===== */
+  .modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(58,51,44,0.45);
+    z-index:50;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--white);
+    border-radius:var(--radius);
+    width:100%;
+    max-width:480px;
+    padding:26px;
+    max-height:92vh;
+    overflow-y:auto;
+    box-shadow:0 12px 40px rgba(0,0,0,0.18);
+  }
+  .modal h3{margin:0 0 16px; color:var(--sage-deep); font-size:1.6rem;}
+  .field{margin-bottom:14px; display:flex; flex-direction:column; gap:5px;}
+  .field label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--ink-soft);
+  }
+  .field input, .field select, .field textarea{width:100%;}
+  .field textarea{resize:vertical; min-height:60px;}
+  .date-field{display:flex; gap:6px; position:relative;}
+  .date-field input[type=text]{flex:1;}
+  .date-field .cal-btn{
+    border:1px solid var(--line);
+    background:var(--cream-deep);
+    border-radius:6px;
+    width:40px;
+    cursor:pointer;
+    font-size:15px;
+    position:relative;
+  }
+  .date-field .cal-btn:hover{background:var(--line);}
+
+  /* ===== Custom date picker popup ===== */
+  .date-popup{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    right:0;
+    z-index:60;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 8px 28px rgba(0,0,0,0.14);
+    padding:12px;
+    width:240px;
+  }
+  .date-popup.open{display:block;}
+  .dp-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .dp-header span{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:600;
+    font-size:1.05rem;
+    color:var(--sage-deep);
+  }
+  .dp-header button{
+    border:1px solid var(--line);
+    background:var(--cream-deep);
+    border-radius:6px;
+    width:26px; height:26px;
+    cursor:pointer;
+    font-size:13px;
+    line-height:1;
+    color:var(--ink);
+  }
+  .dp-header button:hover{background:var(--line);}
+  .dp-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:2px;
+    margin-bottom:8px;
+  }
+  .dp-dow{
+    text-align:center;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--ink-soft);
+    padding:2px 0 4px;
+  }
+  .dp-cell{
+    text-align:center;
+    font-size:12px;
+    padding:5px 0;
+    border-radius:5px;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .dp-cell:hover{background:var(--cream-deep);}
+  .dp-cell.outside{color:var(--ink-soft); opacity:0.45;}
+  .dp-cell.today{border:1px solid var(--gold);}
+  .dp-cell.selected{background:var(--sage); color:var(--white);}
+  .dp-footer{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+  }
+  .dp-footer .btn{flex:1; text-align:center;}
+  .modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:18px;
+  }
+
+  .hint{
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-top:40px;
+  }
+
+  @media (max-width:640px){
+    table{min-width:760px;}
+    .cal-cell{min-height:80px;}
+    .cal-daynum{font-size:0.95rem;}
+    .cal-task{font-size:10px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== PASSWORD LOCK SCREEN ===== -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="eyebrow">Angela &amp; Jeffrey</div>
+    <h2>Wedding Planner</h2>
+    <p>Enter the shared password to continue</p>
+    <input type="password" id="lockInput" placeholder="Password" autocomplete="off">
+    <button class="btn" id="lockSubmit">Unlock</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="sync-status unconfigured" id="syncStatus"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">Wedding Planner</div>
+    <h1>Angela <span class="amp">&amp;</span> Jeffrey</h1>
+    <div class="date-line" id="weddingDateLine">12 · 06 · 2027</div>
+    <div class="countdown" id="countdown"></div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">0 of 0 tasks complete</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="checklist">Checklist</button>
+  <button class="tab-btn" data-tab="calendar">Calendar</button>
+</div>
+
+<div class="container">
+
+  <!-- ===== CHECKLIST VIEW ===== -->
+  <div id="view-checklist">
+    <div class="toolbar">
+      <div class="group">
+        <label>Filter Category</label>
+        <select id="filterCategory"><option value="">All</option></select>
+      </div>
+      <div class="group">
+        <label>Filter Priority</label>
+        <select id="filterPriority">
+          <option value="">All</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+      <div class="group">
+        <label>Filter Status</label>
+        <select id="filterStatus">
+          <option value="">All</option>
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Complete">Complete</option>
+        </select>
+      </div>
+      <button class="btn ghost small" id="btnClearFilters" style="align-self:flex-end;">Clear Filters</button>
+      <div class="spacer"></div>
+      <button class="btn ghost small" id="btnImport">Import Excel</button>
+      <button class="btn outline small" id="btnExport">Export to Excel</button>
+      <button class="btn small" id="btnAddTask">+ Add Task</button>
+      <input type="file" id="fileImport" accept=".xlsx,.xls" style="display:none;">
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="dueDate">Due Date <span class="arrow"></span></th>
+            <th class="no-sort">Task Description</th>
+            <th data-sort="category">Category <span class="arrow"></span></th>
+            <th data-sort="priority">Priority <span class="arrow"></span></th>
+            <th data-sort="status">Status <span class="arrow"></span></th>
+            <th class="no-sort">Comments</th>
+            <th class="no-sort">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="taskTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== CALENDAR VIEW ===== -->
+  <div id="view-calendar" style="display:none;">
+    <div class="cal-header">
+      <div class="cal-nav">
+        <button class="btn ghost small" id="prevMonth">&larr; Prev</button>
+        <button class="btn outline small" id="todayMonth">Today</button>
+      </div>
+      <h2 id="calTitle"></h2>
+      <div class="cal-nav">
+        <button class="btn ghost small" id="nextMonth">Next &rarr;</button>
+      </div>
+    </div>
+    <div class="cal-grid" id="calDow"></div>
+    <div class="cal-grid" id="calGrid" style="margin-top:8px;"></div>
+  </div>
+
+</div>
+
+<footer>Made with care, for the big day · 12.06.2027</footer>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Add Task</h3>
+    <input type="hidden" id="taskId">
+
+    <div class="field">
+      <label>Task Description</label>
+      <textarea id="fDescription" placeholder="e.g. Book photographer"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Category</label>
+      <select id="fCategory"></select>
+    </div>
+
+    <div class="field" id="newCategoryField" style="display:none;">
+      <label>New Category Name</label>
+      <input type="text" id="fNewCategoryText" placeholder="e.g. Wedding Favours" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label>Due Date</label>
+      <div class="date-field">
+        <input type="text" id="fDueDateText" placeholder="DD/MM/YY" autocomplete="off">
+        <button type="button" class="cal-btn" id="fDueDateBtn">📅</button>
+        <div class="date-popup" id="datePopup">
+          <div class="dp-header">
+            <button type="button" id="dpPrev">‹</button>
+            <span id="dpTitle"></span>
+            <button type="button" id="dpNext">›</button>
+          </div>
+          <div class="dp-grid" id="dpGrid"></div>
+          <div class="dp-footer">
+            <button type="button" class="btn ghost small" id="dpClear">Clear</button>
+            <button type="button" class="btn outline small" id="dpToday">Today</button>
+          </div>
+        </div>
+      </div>
+      <div class="hint">Type as DD/MM/YY or pick from the calendar icon</div>
+    </div>
+
+    <div class="field">
+      <label>Priority</label>
+      <select id="fPriority">
+        <option value="Low">Low</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="High">High</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Status</label>
+      <select id="fStatus">
+        <option value="Not Started">Not Started</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Complete">Complete</option>
+      </select>
+    </div>
+
+    <div class="field" id="completedDateField" style="display:none;">
+      <label>Completed Date</label>
+      <div class="date-field">
+        <input type="text" id="fCompletedDateText" placeholder="DD/MM/YY" autocomplete="off">
+        <button type="button" class="cal-btn" id="fCompletedDateBtn">📅</button>
+        <div class="date-popup" id="completedDatePopup">
+          <div class="dp-header">
+            <button type="button" id="cdpPrev">‹</button>
+            <span id="cdpTitle"></span>
+            <button type="button" id="cdpNext">›</button>
+          </div>
+          <div class="dp-grid" id="cdpGrid"></div>
+          <div class="dp-footer">
+            <button type="button" class="btn ghost small" id="cdpClear">Clear</button>
+            <button type="button" class="btn outline small" id="cdpToday">Today</button>
+          </div>
+        </div>
+      </div>
+      <div class="hint">Type as DD/MM/YY or pick from the calendar icon</div>
+    </div>
+
+    <div class="field">
+      <label>Comments</label>
+      <textarea id="fComments" placeholder="Additional notes..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn danger" id="btnDeleteTask" style="display:none;">Delete</button>
+      <div class="spacer"></div>
+      <button class="btn ghost" id="btnCancel">Cancel</button>
+      <button class="btn" id="btnSave">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DATA
+   ========================================================= */
+const WEDDING_DATE = '2027-06-12';
+
+/* ---- Configuration: edit these two values for your setup ---- */
+const SITE_PASSWORD = 'AHJL2027';
+// Paste the Web App URL from your deployed Google Apps Script here.
+// Leave as-is to run in local/offline mode (data won't sync across devices).
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsEju0GE2YvlGlHLFVxHH_LOr-K0Pv-jdAq1Kp9uTuID32Sd914rm5gJsp2mWHaDUb_A/exec';
+const LOCK_STORAGE_KEY = 'aj_wedding_unlocked';
+
+const DEFAULT_CATEGORIES = [
+  "Accommodation","Cake","Catering","Celebrant","Ceremony Music","Date","Decorations",
+  "Dessert","DJ","Engagement Photoshoot","Event Styling","Flowers","Guest List",
+  "Hair and Makeup - Bride","Hair and Makeup - Bridemates","Hair and Styling - Groom",
+  "Hair and Styling - Groomsmen","Invitations","MC","Outfits - Bridesmates",
+  "Parents Meetup","Photobooth","Photographer","Rings","Run Sheet","Sound and Lighting",
+  "Speeches","Suit - Groom","Suits - Groomsmen","Tea Ceremony Dress - Bride","Transport",
+  "Venue","Videographer","Wedding Dress - Bride","Wedding Favours","Wedding Theme",
+  "Wedding Website"
+];
+
+const DEFAULT_TASKS = [
+  {id:1,  description:"Book venue", category:"Venue", dueDate:"", priority:"High", status:"Complete", comments:"Highline venue — booked", completedDate:""},
+  {id:2,  description:"Book photographer", category:"Photographer", dueDate:"", priority:"High", status:"Not Started", comments:"", completedDate:""},
+  {id:3,  description:"Book videographer", category:"Videographer", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:4,  description:"Book photo booth", category:"Photobooth", dueDate:"", priority:"Medium", status:"Not Started", comments:"Highline uses Forever After & Oliver and Co (from $900)", completedDate:""},
+  {id:5,  description:"Book event stylist", category:"Event Styling", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:6,  description:"Book make up artist", category:"Hair and Makeup - Bride", dueDate:"", priority:"High", status:"Not Started", comments:"", completedDate:""},
+  {id:7,  description:"Create wedding website", category:"Wedding Website", dueDate:"", priority:"Low", status:"Not Started", comments:"Withjoy default option", completedDate:""},
+  {id:8,  description:"Create save the date (digital) for family", category:"Invitations", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:9,  description:"Create invitations (physical) for family", category:"Invitations", dueDate:"", priority:"Medium", status:"Not Started", comments:"Aim for July", completedDate:""},
+  {id:10, description:"Issue RSVP (digital) to Angela's family", category:"Invitations", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:11, description:"Issue RSVP (digital) to Jeff's family", category:"Invitations", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:12, description:"Issue RSVP (digital) for all remaining guests", category:"Invitations", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:13, description:"Book celebrant / select officiant", category:"Celebrant", dueDate:"", priority:"High", status:"Not Started", comments:"Bilingual — English + Mandarin preferred", completedDate:""},
+  {id:14, description:"Book DJ", category:"DJ", dueDate:"", priority:"Medium", status:"Not Started", comments:"Savvy Entertainment — Orrin & Michelle's", completedDate:""},
+  {id:15, description:"Settle venue payment", category:"Venue", dueDate:"", priority:"High", status:"Not Started", comments:"Amount/date TBC", completedDate:""},
+  {id:16, description:"Settle photographer payment", category:"Photographer", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:17, description:"Settle make up artist payment", category:"Hair and Makeup - Bride", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:18, description:"Settle photo booth payment", category:"Photobooth", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:19, description:"Book accommodation", category:"Accommodation", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:20, description:"Confirm RSVP & guest list", category:"Guest List", dueDate:"", priority:"High", status:"Not Started", comments:"~160 people needed for banquet numbers", completedDate:""},
+  {id:21, description:"Confirm make up artist schedule & participants", category:"Hair and Makeup - Bride", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:22, description:"Settle styling payment", category:"Hair and Makeup - Bride", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:23, description:"Order suits", category:"Suit - Groom", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:24, description:"Settle celebrant payment", category:"Celebrant", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:25, description:"Ring shopping", category:"Rings", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:26, description:"Order bridesmaid dresses", category:"Hair and Makeup - Bridemates", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:27, description:"Settle wedding DJ payment", category:"DJ", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:28, description:"Order bridesmaid shoes", category:"Outfits - Bridesmates", dueDate:"", priority:"Low", status:"Not Started", comments:"", completedDate:""},
+  {id:29, description:"Seating plan", category:"Guest List", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:30, description:"Confirm AV360 booking (audio/visual/dry ice etc.)", category:"Sound and Lighting", dueDate:"", priority:"Medium", status:"Not Started", comments:"TBC", completedDate:""},
+  {id:31, description:"Write friend notes", category:"Speeches", dueDate:"", priority:"Low", status:"Not Started", comments:"", completedDate:""},
+  {id:32, description:"Confirm photobooth design", category:"Photobooth", dueDate:"", priority:"Low", status:"Not Started", comments:"", completedDate:""},
+  {id:33, description:"Run sheet", category:"Run Sheet", dueDate:"", priority:"Medium", status:"Not Started", comments:"Consider whether tea ceremony happens same day", completedDate:""},
+  {id:34, description:"Write vows", category:"Speeches", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:35, description:"Organise parents meetup", category:"Parents Meetup", dueDate:"", priority:"Low", status:"Complete", comments:"Met in Oct '25 and Dec '25", completedDate:""},
+  {id:36, description:"Start guest list for guest estimate", category:"Guest List", dueDate:"", priority:"High", status:"Not Started", comments:"", completedDate:""},
+  {id:37, description:"Choose bridesmaids and groomsmen", category:"Guest List", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:38, description:"Choose venue theme", category:"Venue", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:39, description:"Create list of venues to check out", category:"Venue", dueDate:"", priority:"Low", status:"Complete", comments:"Highline venue chosen", completedDate:""},
+  {id:40, description:"Choose wedding theme", category:"Wedding Theme", dueDate:"", priority:"High", status:"Not Started", comments:"", completedDate:""},
+  {id:41, description:"Create wedding theme mood board", category:"Wedding Theme", dueDate:"", priority:"Medium", status:"Not Started", comments:"", completedDate:""},
+  {id:42, description:"Choose wedding month", category:"Date", dueDate:"", priority:"High", status:"Complete", comments:"Confirmed: 12 June 2027", completedDate:""}
+];
+
+let tasks = [];
+let categories = [];
+let nextId = 1;
+let sortKey = 'dueDate';
+let sortDir = 'asc';
+let calYear, calMonth; // calMonth 0-indexed
+
+/* =========================================================
+   SYNC (Google Sheet via Apps Script Web App)
+   ========================================================= */
+function isSyncConfigured(){
+  return APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('PASTE_YOUR') === -1;
+}
+
+function setSyncStatus(state, detail){
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  el.classList.remove('synced','saving','offline','unconfigured');
+  el.classList.add(state);
+  const labels = {
+    synced: '● Synced',
+    saving: '● Saving…',
+    offline: '● Offline — changes saved on this device only',
+    unconfigured: '○ Not connected to a shared sheet (local only)'
+  };
+  el.textContent = detail || labels[state] || '';
+}
+
+function normalizeTask(t, fallbackId){
+  return {
+    id: Number(t.id) || fallbackId,
+    description: (t.description ?? '').toString(),
+    category: (t.category ?? '').toString(),
+    dueDate: (t.dueDate ?? '').toString(),
+    priority: (t.priority ?? 'Medium').toString() || 'Medium',
+    status: (t.status ?? 'Not Started').toString() || 'Not Started',
+    comments: (t.comments ?? '').toString(),
+    completedDate: (t.completedDate ?? '').toString()
+  };
+}
+
+async function loadData(){
+  if (isSyncConfigured()){
+    try{
+      const res = await fetch(APPS_SCRIPT_URL, {method:'GET'});
+      if (!res.ok) throw new Error('Bad response');
+      const data = await res.json();
+      if (Array.isArray(data.tasks) && data.tasks.length){
+        tasks = data.tasks.map((t,i)=>normalizeTask(t, i+1));
+      }
+      if (Array.isArray(data.categories) && data.categories.length){
+        categories = data.categories.map(c=>c.toString());
+      }
+      setSyncStatus('synced');
+    }catch(e){
+      setSyncStatus('offline');
+    }
+  } else {
+    setSyncStatus('unconfigured');
+  }
+
+  if (!tasks || !tasks.length){
+    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+  }
+  if (!categories || !categories.length){
+    categories = [...DEFAULT_CATEGORIES];
+  }
+  // ensure all task categories exist in category list
+  tasks.forEach(t=>{
+    if (t.category && !categories.includes(t.category)) categories.push(t.category);
+  });
+  categories = [...new Set(categories)];
+  categories.sort((a,b)=>a.localeCompare(b));
+  nextId = tasks.reduce((m,t)=>Math.max(m,t.id),0) + 1;
+}
+
+let saveTimer = null;
+function saveData(){
+  if (!isSyncConfigured()){
+    setSyncStatus('unconfigured');
+    return;
+  }
+  clearTimeout(saveTimer);
+  setSyncStatus('saving');
+  saveTimer = setTimeout(async ()=>{
+    try{
+      // text/plain avoids a CORS preflight, which Apps Script doesn't handle
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+        body: JSON.stringify({tasks, categories})
+      });
+      if (!res.ok) throw new Error('Bad response');
+      setSyncStatus('synced');
+    }catch(e){
+      setSyncStatus('offline');
+    }
+  }, 600);
+}
+
+/* =========================================================
+   DATE HELPERS
+   ========================================================= */
+// "DD/MM/YY" or "DD/MM/YYYY" -> "YYYY-MM-DD"
+function ddmmyyToISO(str){
+  if (!str) return "";
+  str = str.trim();
+  const m = str.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+  if (!m) return null;
+  let [, d, mo, y] = m;
+  d = d.padStart(2,'0'); mo = mo.padStart(2,'0');
+  if (y.length === 2) y = '20' + y;
+  const iso = `${y}-${mo}-${d}`;
+  const dt = new Date(iso + 'T00:00:00');
+  if (isNaN(dt.getTime())) return null;
+  return iso;
+}
+// "YYYY-MM-DD" -> "DD/MM/YY"
+function isoToDDMMYY(iso){
+  if (!iso) return "";
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y.slice(2)}`;
+}
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* =========================================================
+   GENERIC DIALOG (replaces alert / confirm / prompt, which
+   are blocked inside sandboxed preview frames)
+   ========================================================= */
+const dialogOverlay = document.getElementById('dialogOverlay');
+const dialogTitle = document.getElementById('dialogTitle');
+const dialogMessage = document.getElementById('dialogMessage');
+const dialogInputWrap = document.getElementById('dialogInputWrap');
+const dialogInput = document.getElementById('dialogInput');
+const dialogActions = document.getElementById('dialogActions');
+
+function showDialog({title='', message='', input=false, inputValue='', placeholder='', buttons}){
+  return new Promise(resolve=>{
+    dialogTitle.textContent = title;
+    dialogMessage.textContent = message;
+    dialogMessage.style.display = message ? 'block' : 'none';
+    dialogInputWrap.style.display = input ? 'flex' : 'none';
+    dialogInput.value = inputValue;
+    dialogInput.placeholder = placeholder;
+    dialogActions.innerHTML = '';
+
+    function finish(value){
+      dialogOverlay.classList.remove('open');
+      dialogInput.removeEventListener('keydown', onKeydown);
+      resolve(value);
+    }
+    function onKeydown(e){
+      if (e.key === 'Enter'){
+        e.preventDefault();
+        const primary = buttons.find(b=>b.primary) || buttons[buttons.length-1];
+        finish(primary.value === '__input__' ? dialogInput.value.trim() : primary.value);
+      }
+    }
+
+    buttons.forEach(b=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn ' + (b.class || '');
+      btn.textContent = b.label;
+      btn.addEventListener('click', ()=>{
+        finish(b.value === '__input__' ? dialogInput.value.trim() : b.value);
+      });
+      dialogActions.appendChild(btn);
+    });
+
+    if (input) dialogInput.addEventListener('keydown', onKeydown);
+    dialogOverlay.classList.add('open');
+    if (input) setTimeout(()=>dialogInput.focus(), 50);
+  });
+}
+function showAlert(message, title='Note'){
+  return showDialog({title, message, buttons:[{label:'OK', value:true, primary:true}]});
+}
+function showConfirm(message, title='Please confirm'){
+  return showDialog({title, message, buttons:[
+    {label:'Cancel', value:false, class:'ghost'},
+    {label:'Confirm', value:true, primary:true}
+  ]});
+}
+function showPrompt(message, title='Enter a value', placeholder=''){
+  return showDialog({title, message, input:true, placeholder, buttons:[
+    {label:'Cancel', value:null, class:'ghost'},
+    {label:'Save', value:'__input__', primary:true}
+  ]});
+}
+
+/* =========================================================
+   CATEGORY DROPDOWNS
+   ========================================================= */
+function populateCategorySelect(selectEl, selectedValue, includeAll, includeAddNew){
+  selectEl.innerHTML = '';
+  if (includeAll){
+    const opt = document.createElement('option');
+    opt.value = ''; opt.textContent = 'All';
+    selectEl.appendChild(opt);
+  }
+  categories.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    if (c === selectedValue) opt.selected = true;
+    selectEl.appendChild(opt);
+  });
+  if (includeAddNew){
+    const opt = document.createElement('option');
+    opt.value = '__add_new__'; opt.textContent = '+ Add new category…';
+    selectEl.appendChild(opt);
+  }
+}
+
+function refreshAllCategoryDropdowns(){
+  populateCategorySelect(document.getElementById('filterCategory'), document.getElementById('filterCategory').value, true, false);
+  populateCategorySelect(document.getElementById('fCategory'), document.getElementById('fCategory').value, false, true);
+}
+
+document.getElementById('fCategory').addEventListener('change', (e)=>{
+  const newCatField = document.getElementById('newCategoryField');
+  if (e.target.value === '__add_new__'){
+    newCatField.style.display = '';
+    const input = document.getElementById('fNewCategoryText');
+    input.value = '';
+    setTimeout(()=>input.focus(), 50);
+  } else {
+    newCatField.style.display = 'none';
+    document.getElementById('fNewCategoryText').value = '';
+  }
+});
+
+/* =========================================================
+   RENDER: CHECKLIST TABLE
+   ========================================================= */
+function priorityRank(p){ return {Low:1, Medium:2, High:3}[p] || 0; }
+function statusRank(s){ return {'Not Started':1, 'In Progress':2, 'Complete':3}[s] || 0; }
+
+function getFilteredSortedTasks(){
+  const fCat = document.getElementById('filterCategory').value;
+  const fPrio = document.getElementById('filterPriority').value;
+  const fStat = document.getElementById('filterStatus').value;
+
+  let result = tasks.filter(t=>{
+    if (fCat && t.category !== fCat) return false;
+    if (fPrio && t.priority !== fPrio) return false;
+    if (fStat && t.status !== fStat) return false;
+    return true;
+  });
+
+  result.sort((a,b)=>{
+    let av, bv;
+    switch(sortKey){
+      case 'dueDate':
+        av = a.dueDate || '9999-99-99'; bv = b.dueDate || '9999-99-99'; break;
+      case 'category':
+        av = (a.category||'').toLowerCase(); bv = (b.category||'').toLowerCase(); break;
+      case 'priority':
+        av = priorityRank(a.priority); bv = priorityRank(b.priority); break;
+      case 'status':
+        av = statusRank(a.status); bv = statusRank(b.status); break;
+      default:
+        av = a.id; bv = b.id;
+    }
+    if (av < bv) return sortDir === 'asc' ? -1 : 1;
+    if (av > bv) return sortDir === 'asc' ? 1 : -1;
+    return a.id - b.id;
+  });
+
+  return result;
+}
+
+function renderTable(){
+  const tbody = document.getElementById('taskTableBody');
+  tbody.innerHTML = '';
+  const list = getFilteredSortedTasks();
+
+  if (!list.length){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="7">No tasks match your filters.</td></tr>`;
+  } else {
+    list.forEach(t=>{
+      const tr = document.createElement('tr');
+      const prioClass = 'prio-' + t.priority.toLowerCase();
+      const statClass = 'status-' + t.status.toLowerCase().replace(/\s+/g,'-');
+      tr.innerHTML = `
+        <td>${t.dueDate ? isoToDDMMYY(t.dueDate) : '<span style="color:var(--ink-soft)">—</span>'}</td>
+        <td class="desc">${escapeHtml(t.description)}</td>
+        <td><span class="pill cat">${escapeHtml(t.category || '—')}</span></td>
+        <td><span class="pill ${prioClass}">${t.priority}</span></td>
+        <td><span class="pill ${statClass}">${t.status}</span></td>
+        <td class="comments">${escapeHtml(t.comments || '')}</td>
+        <td class="actions">
+          <button class="btn ghost small" data-edit="${t.id}">Edit</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // header sort arrows
+  document.querySelectorAll('thead th[data-sort]').forEach(th=>{
+    const arrow = th.querySelector('.arrow');
+    if (th.dataset.sort === sortKey){
+      arrow.textContent = sortDir === 'asc' ? '▲' : '▼';
+    } else {
+      arrow.textContent = '';
+    }
+  });
+
+  tbody.querySelectorAll('[data-edit]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openModal(parseInt(btn.dataset.edit)));
+  });
+
+  renderProgress();
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+document.querySelectorAll('thead th[data-sort]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.sort;
+    if (sortKey === key){
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortKey = key; sortDir = 'asc';
+    }
+    renderTable();
+  });
+});
+
+['filterCategory','filterPriority','filterStatus'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', renderTable);
+});
+
+document.getElementById('btnClearFilters').addEventListener('click', ()=>{
+  document.getElementById('filterCategory').value = '';
+  document.getElementById('filterPriority').value = '';
+  document.getElementById('filterStatus').value = '';
+  renderTable();
+});
+
+/* =========================================================
+   PROGRESS / COUNTDOWN
+   ========================================================= */
+function renderProgress(){
+  const total = tasks.length;
+  const done = tasks.filter(t=>t.status === 'Complete').length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} of ${total} tasks complete (${pct}%)`;
+}
+
+function renderCountdown(){
+  const now = new Date();
+  const wedding = new Date(WEDDING_DATE + 'T00:00:00');
+  let diffMs = wedding - now;
+  const el = document.getElementById('countdown');
+  if (diffMs < 0){
+    el.innerHTML = `<div class="chip"><div class="num">🎉</div><div class="lbl">Married!</div></div>`;
+    return;
+  }
+  const totalSeconds = Math.floor(diffMs/1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400)/3600);
+  const minutes = Math.floor((totalSeconds % 3600)/60);
+  el.innerHTML = `
+    <div class="chip"><div class="num">${days}</div><div class="lbl">Days</div></div>
+    <div class="chip"><div class="num">${hours}</div><div class="lbl">Hours</div></div>
+    <div class="chip"><div class="num">${minutes}</div><div class="lbl">Mins</div></div>
+  `;
+}
+
+/* =========================================================
+   MODAL: ADD / EDIT TASK
+   ========================================================= */
+const overlay = document.getElementById('modalOverlay');
+
+function openModal(id){
+  const isEdit = !!id;
+  document.getElementById('modalTitle').textContent = isEdit ? 'Edit Task' : 'Add Task';
+  document.getElementById('btnDeleteTask').style.display = isEdit ? 'inline-block' : 'none';
+  document.getElementById('taskId').value = id || '';
+
+  refreshAllCategoryDropdowns();
+
+  if (isEdit){
+    const t = tasks.find(x=>x.id === id);
+    document.getElementById('fDescription').value = t.description;
+    document.getElementById('fCategory').value = t.category;
+    document.getElementById('fDueDateText').value = t.dueDate ? isoToDDMMYY(t.dueDate) : '';
+    document.getElementById('fPriority').value = t.priority;
+    document.getElementById('fStatus').value = t.status;
+    document.getElementById('fComments').value = t.comments || '';
+    document.getElementById('fCompletedDateText').value = t.completedDate ? isoToDDMMYY(t.completedDate) : '';
+  } else {
+    document.getElementById('fDescription').value = '';
+    document.getElementById('fCategory').value = categories[0] || '';
+    document.getElementById('fDueDateText').value = '';
+    document.getElementById('fPriority').value = 'Medium';
+    document.getElementById('fStatus').value = 'Not Started';
+    document.getElementById('fComments').value = '';
+    document.getElementById('fCompletedDateText').value = '';
+  }
+  // reset "add new category" inline field
+  document.getElementById('newCategoryField').style.display = 'none';
+  document.getElementById('fNewCategoryText').value = '';
+
+  updateCompletedDateVisibility();
+  closeDatePicker();
+  closeCompletedDatePicker();
+  overlay.classList.add('open');
+}
+
+function updateCompletedDateVisibility(){
+  const show = document.getElementById('fStatus').value === 'Complete';
+  document.getElementById('completedDateField').style.display = show ? '' : 'none';
+}
+document.getElementById('fStatus').addEventListener('change', updateCompletedDateVisibility);
+
+function closeModal(){
+  overlay.classList.remove('open');
+  closeDatePicker();
+  closeCompletedDatePicker();
+}
+
+document.getElementById('btnAddTask').addEventListener('click', ()=> openModal(null));
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+overlay.addEventListener('click', (e)=>{ if (e.target === overlay) closeModal(); });
+
+// ===== Custom date picker (reusable for Due Date & Completed Date) =====
+const dueDateText = document.getElementById('fDueDateText');
+const completedDateText = document.getElementById('fCompletedDateText');
+
+function createDatePicker(cfg){
+  let pYear, pMonth;
+
+  function close(){
+    cfg.popup.classList.remove('open');
+  }
+
+  function open(){
+    const current = ddmmyyToISO(cfg.input.value.trim());
+    let base;
+    if (current){
+      const [y,m] = current.split('-');
+      base = {y:parseInt(y), m:parseInt(m)-1};
+    } else {
+      const now = new Date();
+      base = {y:now.getFullYear(), m:now.getMonth()};
+    }
+    pYear = base.y; pMonth = base.m;
+    render();
+    cfg.popup.classList.add('open');
+  }
+
+  function render(){
+    cfg.title.textContent = `${MONTH_NAMES[pMonth]} ${pYear}`;
+    cfg.grid.innerHTML = '';
+    DOW_NAMES.forEach(d=> cfg.grid.insertAdjacentHTML('beforeend', `<div class="dp-dow">${d[0]}</div>`));
+
+    const selectedISO = ddmmyyToISO(cfg.input.value.trim());
+    const todayStr = todayISO();
+    const firstOfMonth = new Date(pYear, pMonth, 1);
+    const startOffset = (firstOfMonth.getDay() + 6) % 7;
+    const daysInMonth = new Date(pYear, pMonth+1, 0).getDate();
+    const daysInPrevMonth = new Date(pYear, pMonth, 0).getDate();
+
+    const cells = [];
+    for (let i = startOffset; i > 0; i--) cells.push({day: daysInPrevMonth - i + 1, outside:true, iso:null});
+    for (let d = 1; d <= daysInMonth; d++){
+      const iso = `${pYear}-${String(pMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      cells.push({day:d, outside:false, iso});
+    }
+    let trailing = 1;
+    while (cells.length % 7 !== 0) cells.push({day: trailing++, outside:true, iso:null});
+
+    cells.forEach(cell=>{
+      const div = document.createElement('div');
+      div.className = 'dp-cell';
+      if (cell.outside) div.classList.add('outside');
+      if (cell.iso === todayStr) div.classList.add('today');
+      if (cell.iso && cell.iso === selectedISO) div.classList.add('selected');
+      div.textContent = cell.day;
+      if (!cell.outside){
+        div.addEventListener('click', ()=>{
+          cfg.input.value = isoToDDMMYY(cell.iso);
+          close();
+        });
+      }
+      cfg.grid.appendChild(div);
+    });
+  }
+
+  cfg.btn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    if (cfg.popup.classList.contains('open')) close();
+    else open();
+  });
+  cfg.prevBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    pMonth--; if (pMonth < 0){ pMonth = 11; pYear--; }
+    render();
+  });
+  cfg.nextBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    pMonth++; if (pMonth > 11){ pMonth = 0; pYear++; }
+    render();
+  });
+  cfg.todayBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    cfg.input.value = isoToDDMMYY(todayISO());
+    close();
+  });
+  cfg.clearBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    cfg.input.value = '';
+    close();
+  });
+  document.addEventListener('click', (e)=>{
+    if (!cfg.popup.contains(e.target) && e.target !== cfg.btn){
+      close();
+    }
+  });
+  cfg.input.addEventListener('blur', (e)=>{
+    // skip validation if focus moved into the date popup
+    if (cfg.popup.contains(e.relatedTarget)) return;
+    const val = cfg.input.value.trim();
+    if (!val) return;
+    const iso = ddmmyyToISO(val);
+    if (iso === null){
+      showAlert('Please enter the date as DD/MM/YY (e.g. 25/12/27), or use the calendar icon to pick a date.', 'Invalid date');
+      cfg.input.focus();
+      return;
+    }
+    cfg.input.value = isoToDDMMYY(iso);
+  });
+
+  return {open, close};
+}
+
+const dueDatePicker = createDatePicker({
+  input: dueDateText,
+  btn: document.getElementById('fDueDateBtn'),
+  popup: document.getElementById('datePopup'),
+  grid: document.getElementById('dpGrid'),
+  title: document.getElementById('dpTitle'),
+  prevBtn: document.getElementById('dpPrev'),
+  nextBtn: document.getElementById('dpNext'),
+  todayBtn: document.getElementById('dpToday'),
+  clearBtn: document.getElementById('dpClear')
+});
+
+const completedDatePicker = createDatePicker({
+  input: completedDateText,
+  btn: document.getElementById('fCompletedDateBtn'),
+  popup: document.getElementById('completedDatePopup'),
+  grid: document.getElementById('cdpGrid'),
+  title: document.getElementById('cdpTitle'),
+  prevBtn: document.getElementById('cdpPrev'),
+  nextBtn: document.getElementById('cdpNext'),
+  todayBtn: document.getElementById('cdpToday'),
+  clearBtn: document.getElementById('cdpClear')
+});
+
+function closeDatePicker(){ dueDatePicker.close(); }
+function closeCompletedDatePicker(){ completedDatePicker.close(); }
+
+
+document.getElementById('btnSave').addEventListener('click', async ()=>{
+  const desc = document.getElementById('fDescription').value.trim();
+  if (!desc){
+    await showAlert('Please enter a task description.', 'Missing description');
+    return;
+  }
+
+  // ----- Category (including inline "add new category") -----
+  let categoryValue = document.getElementById('fCategory').value;
+  if (categoryValue === '__add_new__'){
+    const newCat = document.getElementById('fNewCategoryText').value.trim();
+    if (!newCat){
+      await showAlert('Please enter a name for the new category.', 'Missing category');
+      return;
+    }
+    categoryValue = newCat;
+    if (!categories.includes(newCat)){
+      categories.push(newCat);
+      categories.sort((a,b)=>a.localeCompare(b));
+    }
+  }
+
+  // ----- Due date -----
+  const dueText = dueDateText.value.trim();
+  let dueISO = '';
+  if (dueText){
+    const iso = ddmmyyToISO(dueText);
+    if (iso === null){
+      await showAlert('Please enter the date as DD/MM/YY (e.g. 25/12/27), or use the calendar icon to pick a date.', 'Invalid date');
+      return;
+    }
+    dueISO = iso;
+  }
+
+  // ----- Completed date (only relevant when status is Complete) -----
+  const completedText = completedDateText.value.trim();
+  let completedISO = '';
+  if (completedText){
+    const iso = ddmmyyToISO(completedText);
+    if (iso === null){
+      await showAlert('Please enter the completed date as DD/MM/YY (e.g. 25/12/27), or use the calendar icon to pick a date.', 'Invalid date');
+      return;
+    }
+    completedISO = iso;
+  }
+  const status = document.getElementById('fStatus').value;
+  if (status !== 'Complete') completedISO = '';
+
+  const id = document.getElementById('taskId').value;
+  const data = {
+    description: desc,
+    category: categoryValue,
+    dueDate: dueISO,
+    priority: document.getElementById('fPriority').value,
+    status: status,
+    comments: document.getElementById('fComments').value.trim(),
+    completedDate: completedISO
+  };
+
+  if (id){
+    const t = tasks.find(x=>x.id === parseInt(id));
+    Object.assign(t, data);
+  } else {
+    tasks.push({id: nextId++, ...data});
+  }
+  refreshAllCategoryDropdowns();
+  saveData();
+  closeModal();
+  renderTable();
+  renderCalendar();
+});
+
+document.getElementById('btnDeleteTask').addEventListener('click', async ()=>{
+  const id = parseInt(document.getElementById('taskId').value);
+  const ok = await showConfirm('This task will be permanently removed from your checklist.', 'Delete this task?');
+  if (!ok) return;
+  tasks = tasks.filter(t=>t.id !== id);
+  saveData();
+  closeModal();
+  renderTable();
+  renderCalendar();
+});
+
+/* =========================================================
+   EXPORT / IMPORT EXCEL
+   ========================================================= */
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const data = tasks.map(t=>({
+    'Due Date': t.dueDate ? new Date(t.dueDate + 'T00:00:00') : '',
+    'Task Description': t.description,
+    'Category': t.category,
+    'Priority': t.priority,
+    'Status': t.status,
+    'Completed Date': t.completedDate ? new Date(t.completedDate + 'T00:00:00') : '',
+    'Comments': t.comments || ''
+  }));
+  const ws = XLSX.utils.json_to_sheet(data, {cellDates:true});
+  ws['!cols'] = [{wch:12},{wch:45},{wch:24},{wch:10},{wch:14},{wch:14},{wch:40}];
+  // Force Australian dd/mm/yyyy display regardless of the spreadsheet
+  // app's locale settings (the format is stored in the cell itself).
+  const dateCols = [0, 5]; // Due Date, Completed Date
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R = range.s.r + 1; R <= range.e.r; R++){
+    dateCols.forEach(C=>{
+      const cellRef = XLSX.utils.encode_cell({r:R, c:C});
+      const cell = ws[cellRef];
+      if (cell && cell.t === 'd'){
+        cell.z = 'dd/mm/yyyy';
+      }
+    });
+  }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Checklist');
+  XLSX.writeFile(wb, 'AHJL_Wedding_Checklist.xlsx');
+});
+
+document.getElementById('btnImport').addEventListener('click', ()=>{
+  document.getElementById('fileImport').click();
+});
+document.getElementById('fileImport').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (evt)=>{
+    try{
+      const wb = XLSX.read(evt.target.result, {type:'binary', cellDates:true});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+
+      function parseImportedDate(v){
+        if (v instanceof Date){
+          return v.getFullYear() + '-' + String(v.getMonth()+1).padStart(2,'0') + '-' + String(v.getDate()).padStart(2,'0');
+        }
+        v = (v ?? '').toString().trim();
+        if (!v) return '';
+        return ddmmyyToISO(v) || '';
+      }
+
+      const imported = [];
+      rows.forEach(r=>{
+        const desc = (r['Task Description'] || r['Task'] || r['Description'] || '').toString().trim();
+        if (!desc) return;
+        const dueISO = parseImportedDate(r['Due Date']);
+        const completedISO = parseImportedDate(r['Completed Date']);
+        let cat = (r['Category'] || '').toString().trim();
+        if (cat && !categories.includes(cat)) categories.push(cat);
+        imported.push({
+          id: nextId++,
+          description: desc,
+          category: cat,
+          dueDate: dueISO,
+          priority: (r['Priority'] || 'Medium').toString().trim() || 'Medium',
+          status: (r['Status'] || 'Not Started').toString().trim() || 'Not Started',
+          comments: (r['Comments'] || '').toString().trim(),
+          completedDate: completedISO
+        });
+      });
+      if (imported.length){
+        const choice = await showDialog({
+          title: 'Import checklist',
+          message: `Found ${imported.length} task(s) in this file. How would you like to add them?`,
+          buttons: [
+            {label:'Cancel', value:'cancel', class:'ghost'},
+            {label:'Append', value:'append', class:'outline'},
+            {label:'Replace All', value:'replace', primary:true}
+          ]
+        });
+        if (choice === 'cancel') { e.target.value = ''; return; }
+        if (choice === 'replace') tasks = imported;
+        else tasks = tasks.concat(imported);
+
+        categories.sort((a,b)=>a.localeCompare(b));
+        saveData();
+        renderTable();
+        refreshAllCategoryDropdowns();
+        renderCalendar();
+      } else {
+        await showAlert('No tasks were found in this file. Make sure it has a "Task Description" column.', 'Nothing to import');
+      }
+    }catch(err){
+      await showAlert('Could not read this file. Please make sure it is a valid Excel export.', 'Import failed');
+    }
+    e.target.value = '';
+  };
+  reader.readAsBinaryString(file);
+});
+
+/* =========================================================
+   CALENDAR
+   ========================================================= */
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DOW_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function renderCalendarDow(){
+  const dow = document.getElementById('calDow');
+  dow.innerHTML = DOW_NAMES.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+}
+
+function renderCalendar(){
+  document.getElementById('calTitle').textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstOfMonth = new Date(calYear, calMonth, 1);
+  // JS getDay(): 0=Sun..6=Sat. Convert to Monday-first index 0=Mon..6=Sun
+  let startOffset = (firstOfMonth.getDay() + 6) % 7;
+
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
+
+  const todayStr = todayISO();
+
+  // tasks grouped by date
+  const tasksByDate = {};
+  tasks.forEach(t=>{
+    if (!t.dueDate) return;
+    (tasksByDate[t.dueDate] = tasksByDate[t.dueDate] || []).push(t);
+  });
+
+  const cells = [];
+
+  // leading days from previous month
+  for (let i = startOffset; i > 0; i--){
+    const dayNum = daysInPrevMonth - i + 1;
+    cells.push({day: dayNum, outside:true, dateStr:null});
+  }
+  // days of current month
+  for (let d = 1; d <= daysInMonth; d++){
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cells.push({day:d, outside:false, dateStr});
+  }
+  // trailing days to complete the grid (multiples of 7)
+  let trailing = 1;
+  while (cells.length % 7 !== 0){
+    cells.push({day: trailing++, outside:true, dateStr:null});
+  }
+
+  cells.forEach(cell=>{
+    const div = document.createElement('div');
+    div.className = 'cal-cell' + (cell.outside ? ' outside' : '');
+    if (cell.dateStr === todayStr) div.classList.add('today');
+
+    const dayNum = document.createElement('div');
+    dayNum.className = 'cal-daynum';
+    dayNum.textContent = cell.day;
+    div.appendChild(dayNum);
+
+    if (!cell.outside && tasksByDate[cell.dateStr]){
+      tasksByDate[cell.dateStr]
+        .sort((a,b)=>priorityRank(b.priority)-priorityRank(a.priority))
+        .forEach(t=>{
+          const item = document.createElement('div');
+          item.className = `cal-task prio-${t.priority.toLowerCase()} status-${t.status.toLowerCase().replace(/\s+/g,'-')}`;
+          item.textContent = t.description;
+          item.title = `${t.category} · ${t.priority} priority · ${t.status}`;
+          item.addEventListener('click', ()=> openModal(t.id));
+          div.appendChild(item);
+        });
+    }
+    grid.appendChild(div);
+  });
+}
+
+document.getElementById('prevMonth').addEventListener('click', ()=>{
+  calMonth--;
+  if (calMonth < 0){ calMonth = 11; calYear--; }
+  renderCalendar();
+});
+document.getElementById('nextMonth').addEventListener('click', ()=>{
+  calMonth++;
+  if (calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+});
+document.getElementById('todayMonth').addEventListener('click', ()=>{
+  const now = new Date();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
+  renderCalendar();
+});
+
+/* =========================================================
+   TABS
+   ========================================================= */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.getElementById('view-checklist').style.display = tab === 'checklist' ? 'block' : 'none';
+    document.getElementById('view-calendar').style.display = tab === 'calendar' ? 'block' : 'none';
+    if (tab === 'calendar') renderCalendar();
+  });
+});
+
+/* =========================================================
+   INIT
+   ========================================================= */
+async function init(){
+  await loadData();
+  refreshAllCategoryDropdowns();
+  renderTable();
+  renderCountdown();
+  setInterval(renderCountdown, 60000);
+
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  renderCalendarDow();
+  renderCalendar();
+}
+
+/* =========================================================
+   PASSWORD GATE
+   ========================================================= */
+const lockScreen = document.getElementById('lockScreen');
+const lockInput = document.getElementById('lockInput');
+const lockError = document.getElementById('lockError');
+
+function unlockApp(){
+  lockScreen.style.display = 'none';
+  init();
+}
+
+function attemptUnlock(){
+  if (lockInput.value === SITE_PASSWORD){
+    try{ localStorage.setItem(LOCK_STORAGE_KEY, 'true'); }catch(e){}
+    lockError.textContent = '';
+    unlockApp();
+  } else {
+    lockError.textContent = 'Incorrect password — please try again.';
+    lockInput.value = '';
+    lockInput.focus();
+  }
+}
+
+document.getElementById('lockSubmit').addEventListener('click', attemptUnlock);
+lockInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') attemptUnlock(); });
+
+(function startup(){
+  let alreadyUnlocked = false;
+  try{ alreadyUnlocked = localStorage.getItem(LOCK_STORAGE_KEY) === 'true'; }catch(e){}
+  if (alreadyUnlocked){
+    unlockApp();
+  } else {
+    lockInput.focus();
+  }
+})();
+</script>
+<!-- ===== GENERIC DIALOG (replaces alert/confirm/prompt) ===== -->
+<div class="modal-overlay" id="dialogOverlay">
+  <div class="modal" style="max-width:380px;">
+    <h3 id="dialogTitle">Title</h3>
+    <p id="dialogMessage" style="margin:0 0 14px; color:var(--ink-soft); font-size:13px; line-height:1.5;"></p>
+    <div class="field" id="dialogInputWrap" style="display:none;">
+      <input type="text" id="dialogInput">
+    </div>
+    <div class="modal-actions" id="dialogActions"></div>
+  </div>
+</div>
+
+</body>
+</html>
