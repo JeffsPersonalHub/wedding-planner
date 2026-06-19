@@ -22,6 +22,8 @@
     --white:#FFFFFF;
     --radius:10px;
     --shadow: 0 4px 18px rgba(77,134,184,0.08);
+    --color-complete:#4F9272;
+    --color-empty:#D0DCE6;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -579,6 +581,339 @@
     .cal-daynum{font-size:0.95rem;}
     .cal-task{font-size:10px;}
   }
+
+  /* ===== Tabs (updated for 6 tabs) ===== */
+  .tabs{max-width:900px; flex-wrap:wrap;}
+  .tab-btn{flex:none; padding:9px 16px; font-size:12px;}
+
+  /* ===== Filter Panels ===== */
+  .filter-panel{position:relative;}
+  .filter-panel-header{
+    display:flex; align-items:center; gap:6px;
+    padding:7px 12px; border:1px solid var(--line);
+    border-radius:6px; background:var(--white);
+    cursor:pointer; font-size:12px; font-weight:500;
+    color:var(--ink); white-space:nowrap;
+    font-family:'Jost',sans-serif; transition:all .15s;
+  }
+  .filter-panel-header:hover{border-color:var(--ink-soft);}
+  .filter-panel-header.has-filters{border-color:var(--sage); color:var(--sage-deep); background:var(--cream-deep);}
+  .fp-badge{
+    background:var(--sage); color:white; border-radius:999px;
+    padding:1px 6px; font-size:10px; font-weight:600; display:none;
+  }
+  .fp-badge.visible{display:inline-block;}
+  .fp-arrow{font-size:10px; color:var(--ink-soft);}
+  .filter-panel-body{
+    display:none; position:absolute; top:calc(100% + 4px); left:0;
+    z-index:30; background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:0 8px 28px rgba(0,0,0,.12);
+    padding:8px; min-width:190px; max-height:260px; overflow-y:auto;
+  }
+  .filter-panel-body.open{display:block;}
+  .filter-checkbox{
+    display:flex; align-items:center; gap:8px; padding:5px 6px;
+    cursor:pointer; font-size:12.5px; border-radius:4px; user-select:none;
+  }
+  .filter-checkbox:hover{background:var(--cream-deep);}
+  .filter-checkbox input[type=checkbox]{
+    width:14px; height:14px; cursor:pointer; accent-color:var(--sage); flex-shrink:0;
+  }
+
+  /* ===== Dashboard ===== */
+  .dash-filters{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); padding:14px;
+    box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  .dash-metrics{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:12px; margin-bottom:16px;
+  }
+  .metric-card{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); padding:16px 14px;
+    text-align:center; box-shadow:var(--shadow);
+  }
+  .metric-card .metric-val{
+    font-family:'Cormorant Garamond',serif;
+    font-size:2.2rem; font-weight:600; color:var(--sage-deep); line-height:1;
+  }
+  .metric-card .metric-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--ink-soft); margin-top:6px;
+  }
+  .metric-card.m-complete .metric-val{color:#4F9272;}
+  .metric-card.m-pct .metric-val{color:var(--blush-deep);}
+  .metric-card.m-progress .metric-val{color:var(--sage-deep);}
+  .dash-section{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); padding:20px;
+    box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  .dash-section h3{margin:0 0 16px; font-size:1.1rem; color:var(--sage-deep);}
+  .dash-progress-row{
+    display:grid; grid-template-columns:minmax(160px,220px) 1fr 52px;
+    align-items:center; gap:12px; margin-bottom:10px;
+  }
+  .dash-progress-label{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:8px; font-size:12.5px; min-width:0;
+  }
+  .dash-progress-label span:first-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .dash-progress-meta{color:var(--ink-soft); font-size:11px; white-space:nowrap;}
+  .dash-progress-track{height:9px; background:var(--cream-deep); border-radius:4px; overflow:hidden;}
+  .dash-progress-fill{height:100%; background:var(--sage); border-radius:4px; transition:width .4s;}
+  .dash-progress-fill.pf-high{background:var(--blush-deep);}
+  .dash-progress-fill.pf-medium{background:#C99A3B;}
+  .dash-progress-fill.pf-low{background:#5C9C7C;}
+  .dash-progress-pct{font-size:12px; color:var(--ink-soft); text-align:right; white-space:nowrap;}
+  .dash-two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:700px){.dash-two-col{grid-template-columns:1fr;} .dash-progress-row{grid-template-columns:140px 1fr 44px;}}
+
+  /* ===== Expenses ===== */
+  .exp-summary{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px; margin-bottom:16px;
+  }
+  .exp-card{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); padding:16px 14px; box-shadow:var(--shadow);
+  }
+  .exp-card .ec-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--ink-soft); margin-bottom:6px;
+  }
+  .exp-card .ec-val{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.8rem; font-weight:600; color:var(--sage-deep);
+  }
+  .exp-card.ec-outstanding .ec-val{color:var(--blush-deep);}
+  .exp-card.ec-paid .ec-val{color:#4F9272;}
+  .exp-outstanding-display{
+    background:var(--cream-deep); border:1px solid var(--line);
+    border-radius:6px; padding:10px 12px; font-size:13px;
+    color:var(--sage-deep); font-weight:500;
+  }
+
+  /* ===== Notes ===== */
+  .notes-wrap{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
+  }
+  .notes-toolbar{
+    display:flex; flex-wrap:wrap; align-items:center; gap:2px;
+    padding:8px 12px; border-bottom:1px solid var(--line);
+    background:var(--cream-deep);
+  }
+  .notes-tool-btn{
+    border:1px solid transparent; background:transparent; border-radius:5px;
+    width:30px; height:30px; cursor:pointer; font-size:14px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ink); transition:all .12s; font-family:'Jost',sans-serif;
+    padding:0; line-height:1;
+  }
+  .notes-tool-btn:hover{background:var(--line); border-color:var(--line);}
+  .notes-tool-sep{width:1px; height:22px; background:var(--line); margin:0 4px; flex-shrink:0;}
+  .notes-size-select{
+    font-size:12px; padding:4px 6px; border:1px solid var(--line);
+    border-radius:5px; background:var(--white); color:var(--ink);
+    font-family:'Jost',sans-serif; cursor:pointer; height:30px; outline:none;
+  }
+  .notes-editor{
+    min-height:500px; padding:22px 26px; outline:none;
+    font-size:14px; line-height:1.75; color:var(--ink);
+    font-family:'Jost',sans-serif;
+  }
+  .notes-editor:empty::before{
+    content:'Start typing here… Use the toolbar to format text, add checkboxes, tables, and attachments.';
+    color:var(--ink-soft); font-style:italic; pointer-events:none;
+    display:block;
+  }
+  .notes-editor h1{font-family:'Cormorant Garamond',serif; font-size:2rem; margin:1rem 0 .4rem; color:var(--sage-deep);}
+  .notes-editor h2{font-family:'Cormorant Garamond',serif; font-size:1.6rem; margin:.9rem 0 .3rem; color:var(--sage-deep);}
+  .notes-editor h3{font-family:'Cormorant Garamond',serif; font-size:1.25rem; margin:.8rem 0 .25rem;}
+  .notes-editor ul, .notes-editor ol{padding-left:24px; margin:.4rem 0;}
+  .notes-editor li{margin-bottom:3px;}
+  .notes-editor table{border-collapse:collapse; width:100%; margin:10px 0;}
+  .notes-editor td, .notes-editor th{
+    border:1px solid var(--line); padding:7px 10px; font-size:13px; min-width:80px;
+  }
+  .notes-editor th{background:var(--cream-deep); font-weight:600;}
+  .note-check-item{display:flex; align-items:flex-start; gap:8px; margin:3px 0; line-height:1.6;}
+  .note-check-item input[type=checkbox]{margin-top:3px; accent-color:var(--sage); flex-shrink:0; cursor:pointer;}
+  .note-attachment{
+    display:inline-flex; align-items:center; gap:5px;
+    background:var(--cream-deep); border:1px solid var(--line);
+    border-radius:5px; padding:3px 9px; font-size:12px; color:var(--sage-deep);
+    text-decoration:none; margin:2px; cursor:pointer;
+  }
+  .note-attachment:hover{background:var(--line);}
+  .notes-footer{
+    font-size:11px; color:var(--ink-soft); padding:6px 16px;
+    border-top:1px solid var(--line); text-align:right; background:var(--cream-deep);
+  }
+
+  /* ===== Admin ===== */
+  .admin-section{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); padding:22px;
+    box-shadow:var(--shadow); margin-bottom:16px;
+  }
+  .admin-section h3{margin:0 0 4px; color:var(--sage-deep); font-size:1.3rem;}
+  .admin-desc{font-size:12.5px; color:var(--ink-soft); margin:0 0 16px; line-height:1.5;}
+  .cat-list{display:flex; flex-direction:column; gap:6px; margin-bottom:14px;}
+  .cat-row{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 12px; border:1px solid var(--line);
+    border-radius:8px; background:var(--cream);
+    transition:background .15s;
+  }
+  .cat-row:hover{background:var(--cream-deep);}
+  .cat-row-name{flex:1; font-size:13.5px; font-weight:500;}
+  .cat-row-count{font-size:11px; color:var(--ink-soft); white-space:nowrap;}
+  .admin-add-cat{display:flex; gap:8px; align-items:center;}
+  .admin-add-cat input{flex:1;}
+
+  /* ===== Admin cog button in hero ===== */
+  .admin-cog-btn{
+    position:absolute; top:48px; right:14px; z-index:2;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25);
+    color:rgba(255,255,255,0.85); border-radius:8px;
+    width:32px; height:32px; cursor:pointer; font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .2s; padding:0; line-height:1;
+  }
+  .admin-cog-btn:hover{background:rgba(255,255,255,0.22); color:white;}
+  .admin-cog-btn.active{background:rgba(255,255,255,0.3); border-color:rgba(255,255,255,0.55); color:white;}
+
+  /* ===== Upcoming tasks (calendar) ===== */
+  .upcoming-wrap{
+    background:var(--white); border:1px solid var(--line);
+    border-radius:var(--radius); margin-bottom:14px; box-shadow:var(--shadow); overflow:hidden;
+  }
+  .upcoming-header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:11px 16px; cursor:pointer; font-weight:500; font-size:13px;
+    color:var(--sage-deep); user-select:none; background:var(--cream-deep);
+    transition:background .15s;
+  }
+  .upcoming-header:hover{background:var(--line);}
+  .upcoming-toggle{font-size:12px; transition:transform .2s; color:var(--ink-soft);}
+  .upcoming-header.open .upcoming-toggle{transform:rotate(180deg);}
+  .upcoming-list{display:none; max-height:220px; overflow-y:auto;}
+  .upcoming-list.open{display:block;}
+  .upcoming-item{
+    display:flex; align-items:center; gap:10px; padding:9px 16px;
+    border-top:1px solid var(--line); font-size:13px; cursor:pointer;
+    transition:background .12s;
+  }
+  .upcoming-item:hover{background:var(--cream);}
+  .upcoming-date{color:var(--ink-soft); font-size:11.5px; white-space:nowrap; min-width:68px;}
+  .upcoming-desc{flex:1; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .upcoming-empty{padding:16px; text-align:center; color:var(--ink-soft); font-style:italic; font-size:13px;}
+
+  /* ===== Pie / Donut charts ===== */
+  .pie-row{display:flex; align-items:center; gap:28px; flex-wrap:wrap; justify-content:center; padding:8px 0 4px;}
+  .pie-donut{
+    position:relative; width:160px; height:160px; border-radius:50%;
+    background:var(--line); flex-shrink:0;
+  }
+  .pie-donut::after{
+    content:''; position:absolute; inset:34px;
+    background:var(--white); border-radius:50%;
+  }
+  .pie-center-label{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; z-index:1; text-align:center;
+  }
+  .pie-center-pct{
+    font-family:'Cormorant Garamond',serif; font-size:1.75rem;
+    font-weight:600; color:var(--sage-deep); line-height:1;
+  }
+  .pie-center-sub{
+    font-size:10px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--ink-soft); margin-top:3px;
+  }
+  .pie-legend{display:flex; flex-direction:column; gap:9px; min-width:140px;}
+  .pie-legend-item{display:flex; align-items:center; gap:8px; font-size:12.5px;}
+  .pie-legend-dot{width:12px; height:12px; border-radius:50%; flex-shrink:0;}
+  .pie-legend-label{color:var(--ink); flex:1;}
+  .pie-legend-val{color:var(--ink-soft); font-weight:500;}
+
+  /* ===== Dashboard section headings ===== */
+  .dash-section-title{
+    font-family:'Cormorant Garamond',serif; font-size:1.35rem;
+    color:var(--sage-deep); margin:0 0 14px;
+    padding-bottom:10px; border-bottom:1px solid var(--line);
+  }
+  .dash-progress-sublabel{
+    font-size:11px; font-weight:600; color:var(--sage-deep);
+    text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;
+  }
+
+  /* ===== Hero logo ===== */
+  .hero-logo{
+    position:absolute; top:10px; left:14px;
+    max-height:42px; max-width:120px;
+    object-fit:contain; display:none;
+    border-radius:6px;
+  }
+
+  /* ===== Admin settings rows ===== */
+  .admin-setting-row{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:12px; flex-wrap:wrap;
+  }
+  .admin-setting-row label{
+    font-size:13px; color:var(--ink); min-width:120px; font-weight:500;
+  }
+  .admin-setting-row input[type=text],
+  .admin-setting-row input[type=number],
+  .admin-setting-row input[type=date],
+  .admin-setting-row select{
+    flex:1; min-width:180px;
+    padding:7px 10px; border:1px solid var(--line);
+    border-radius:var(--radius); font-size:13px;
+    font-family:inherit; color:var(--ink); background:var(--white);
+  }
+  .admin-setting-row input[type=text]:focus,
+  .admin-setting-row input[type=number]:focus,
+  .admin-setting-row input[type=date]:focus,
+  .admin-setting-row select:focus{
+    outline:none; border-color:var(--sage);
+  }
+  .admin-setting-note{
+    font-size:11px; color:var(--ink-soft); margin-top:-6px; margin-bottom:10px;
+  }
+
+  /* ===== Palette swatches ===== */
+  .palette-grid{display:flex; gap:12px; flex-wrap:wrap; margin-top:10px;}
+  .palette-swatch-wrap{text-align:center;}
+  .palette-swatch{
+    width:44px; height:44px; border-radius:50%; cursor:pointer;
+    border:3px solid transparent; transition:border-color .15s, transform .15s;
+    display:block; margin:0 auto;
+  }
+  .palette-swatch.active{border-color:var(--ink); transform:scale(1.12);}
+  .palette-swatch:hover:not(.active){border-color:var(--ink-soft); transform:scale(1.06);}
+  .palette-swatch-label{font-size:10px; color:var(--ink-soft); margin-top:4px; white-space:nowrap;}
+
+  /* ===== Dashboard pie solo row ===== */
+  .dash-pie-solo{
+    display:flex; justify-content:center; align-items:center;
+    gap:32px; flex-wrap:wrap; margin:16px 0 20px;
+  }
+  .dash-budget-filter-bar{
+    display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;
+  }
+
+  /* ===== Admin sync status ===== */
+  #adminSyncStatus{
+    font-size:12px; color:var(--ink-soft);
+    margin-top:4px; min-height:18px;
+  }
 </style>
 </head>
 <body>
@@ -597,9 +932,11 @@
 
 <div class="hero">
   <div class="sync-status unconfigured" id="syncStatus"></div>
+  <button class="admin-cog-btn" id="btnAdminCog" title="Admin / Category Settings">⚙</button>
+  <img class="hero-logo" id="heroLogo" alt="Wedding logo">
   <div class="hero-inner">
     <div class="eyebrow">Wedding Planner</div>
-    <h1>Angela <span class="amp">&amp;</span> Jeffrey</h1>
+    <h1 id="heroTitle">Angela <span class="amp">&amp;</span> Jeffrey</h1>
     <div class="date-line" id="weddingDateLine">12 · 06 · 2027</div>
     <div class="countdown" id="countdown"></div>
     <div class="progress-wrap">
@@ -610,38 +947,50 @@
 </div>
 
 <div class="tabs">
-  <button class="tab-btn active" data-tab="checklist">Checklist</button>
+  <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
   <button class="tab-btn" data-tab="calendar">Calendar</button>
+  <button class="tab-btn" data-tab="checklist">Checklist</button>
+  <button class="tab-btn" data-tab="expenses">Expenses</button>
+  <button class="tab-btn" data-tab="notes">Notes</button>
 </div>
 
 <div class="container">
 
   <!-- ===== CHECKLIST VIEW ===== -->
-  <div id="view-checklist">
+  <div id="view-checklist" style="display:none;">
     <div class="toolbar">
-      <div class="group">
-        <label>Filter Category</label>
-        <select id="filterCategory"><option value="">All</option></select>
+      <!-- Category filter panel -->
+      <div class="filter-panel" id="fpCategory">
+        <button class="filter-panel-header" id="fpCategoryBtn" type="button">
+          Category <span class="fp-badge" id="fpCategoryBadge"></span><span class="fp-arrow">▾</span>
+        </button>
+        <div class="filter-panel-body" id="fpCategoryBody">
+          <!-- populated by JS -->
+        </div>
       </div>
-      <div class="group">
-        <label>Filter Priority</label>
-        <select id="filterPriority">
-          <option value="">All</option>
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
+      <!-- Priority filter panel -->
+      <div class="filter-panel" id="fpPriority">
+        <button class="filter-panel-header" id="fpPriorityBtn" type="button">
+          Priority <span class="fp-badge" id="fpPriorityBadge"></span><span class="fp-arrow">▾</span>
+        </button>
+        <div class="filter-panel-body" id="fpPriorityBody">
+          <label class="filter-checkbox"><input type="checkbox" value="High"> High</label>
+          <label class="filter-checkbox"><input type="checkbox" value="Medium"> Medium</label>
+          <label class="filter-checkbox"><input type="checkbox" value="Low"> Low</label>
+        </div>
       </div>
-      <div class="group">
-        <label>Filter Status</label>
-        <select id="filterStatus">
-          <option value="">All</option>
-          <option value="Not Started">Not Started</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Complete">Complete</option>
-        </select>
+      <!-- Status filter panel -->
+      <div class="filter-panel" id="fpStatus">
+        <button class="filter-panel-header" id="fpStatusBtn" type="button">
+          Status <span class="fp-badge" id="fpStatusBadge"></span><span class="fp-arrow">▾</span>
+        </button>
+        <div class="filter-panel-body" id="fpStatusBody">
+          <label class="filter-checkbox"><input type="checkbox" value="Not Started"> Not Started</label>
+          <label class="filter-checkbox"><input type="checkbox" value="In Progress"> In Progress</label>
+          <label class="filter-checkbox"><input type="checkbox" value="Complete"> Complete</label>
+        </div>
       </div>
-      <button class="btn ghost small" id="btnClearFilters" style="align-self:flex-end;">Clear Filters</button>
+      <button class="btn ghost small" id="btnClearFilters" style="align-self:center;">Clear Filters</button>
       <div class="spacer"></div>
       <button class="btn ghost small" id="btnImport">Import Excel</button>
       <button class="btn outline small" id="btnExport">Export to Excel</button>
@@ -669,6 +1018,13 @@
 
   <!-- ===== CALENDAR VIEW ===== -->
   <div id="view-calendar" style="display:none;">
+    <div class="upcoming-wrap">
+      <div class="upcoming-header" id="upcomingHeader">
+        <span>📅 Upcoming — next <span id="upcomingDaysLabel">30</span> days</span>
+        <span class="upcoming-toggle" id="upcomingToggle">▾</span>
+      </div>
+      <div class="upcoming-list open" id="upcomingList"></div>
+    </div>
     <div class="cal-header">
       <div class="cal-nav">
         <button class="btn ghost small" id="prevMonth">&larr; Prev</button>
@@ -683,9 +1039,267 @@
     <div class="cal-grid" id="calGrid" style="margin-top:8px;"></div>
   </div>
 
+
+  <!-- ===== DASHBOARD VIEW ===== -->
+  <div id="view-dashboard">
+
+    <!-- ── Section A: Task Completion ── -->
+    <div class="dash-section" style="margin-bottom:20px;">
+      <h3 class="dash-section-title">Task Completion</h3>
+
+      <!-- Filters -->
+      <div class="dash-filters" style="margin-bottom:14px;">
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-right:4px;">Filter</span>
+        <div class="filter-panel" id="dfpCategory">
+          <button class="filter-panel-header" id="dfpCategoryBtn" type="button">
+            Category <span class="fp-badge" id="dfpCategoryBadge"></span><span class="fp-arrow">▾</span>
+          </button>
+          <div class="filter-panel-body" id="dfpCategoryBody"></div>
+        </div>
+        <div class="filter-panel" id="dfpPriority">
+          <button class="filter-panel-header" id="dfpPriorityBtn" type="button">
+            Priority <span class="fp-badge" id="dfpPriorityBadge"></span><span class="fp-arrow">▾</span>
+          </button>
+          <div class="filter-panel-body" id="dfpPriorityBody">
+            <label class="filter-checkbox"><input type="checkbox" value="High"> High</label>
+            <label class="filter-checkbox"><input type="checkbox" value="Medium"> Medium</label>
+            <label class="filter-checkbox"><input type="checkbox" value="Low"> Low</label>
+          </div>
+        </div>
+        <button class="btn ghost small" id="btnDashClearFilters" style="align-self:center;">Clear</button>
+      </div>
+
+      <!-- Row 1: Pie chart on its own row -->
+      <div class="dash-pie-solo">
+        <div class="pie-donut" id="taskPieChart">
+          <div class="pie-center-label">
+            <div class="pie-center-pct" id="taskPiePct">0%</div>
+            <div class="pie-center-sub">done</div>
+          </div>
+        </div>
+        <div class="pie-legend" id="taskPieLegend"></div>
+      </div>
+
+      <!-- Row 2: Metric tiles -->
+      <div class="dash-metrics" style="margin-bottom:18px;">
+        <div class="metric-card"><div class="metric-val" id="dashTotal">0</div><div class="metric-label">Total Tasks</div></div>
+        <div class="metric-card m-complete"><div class="metric-val" id="dashComplete">0</div><div class="metric-label">Complete</div></div>
+        <div class="metric-card m-progress"><div class="metric-val" id="dashInProgress">0</div><div class="metric-label">In Progress</div></div>
+        <div class="metric-card"><div class="metric-val" id="dashNotStarted">0</div><div class="metric-label">Not Started</div></div>
+        <div class="metric-card m-pct"><div class="metric-val" id="dashPct">0%</div><div class="metric-label">% Done</div></div>
+      </div>
+
+      <!-- Row 3: Progress bars side by side -->
+      <div class="dash-two-col">
+        <div>
+          <div class="dash-progress-sublabel">By Category</div>
+          <div id="dashCatSection"></div>
+        </div>
+        <div>
+          <div class="dash-progress-sublabel">By Priority</div>
+          <div id="dashPrioSection"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section B: Budget Tracker ── -->
+    <div class="dash-section">
+      <h3 class="dash-section-title">Budget Tracker</h3>
+
+      <!-- Budget category filter -->
+      <div class="dash-budget-filter-bar">
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-right:4px;">Filter</span>
+        <div class="filter-panel" id="dfpExpCategory">
+          <button class="filter-panel-header" id="dfpExpCategoryBtn" type="button">
+            Category <span class="fp-badge" id="dfpExpCategoryBadge"></span><span class="fp-arrow">▾</span>
+          </button>
+          <div class="filter-panel-body" id="dfpExpCategoryBody"></div>
+        </div>
+        <button class="btn ghost small" id="btnDashExpClearFilters" style="align-self:center;">Clear</button>
+      </div>
+
+      <!-- Row 1: Budget pie chart on its own row -->
+      <div class="dash-pie-solo">
+        <div class="pie-donut" id="budgetPieChart">
+          <div class="pie-center-label">
+            <div class="pie-center-pct" id="budgetPiePct">—</div>
+            <div class="pie-center-sub">paid</div>
+          </div>
+        </div>
+        <div class="pie-legend" id="budgetPieLegend">
+          <div style="color:var(--ink-soft);font-style:italic;font-size:13px;">Add expenses to see budget breakdown</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Budget tiles -->
+      <div class="exp-summary" style="margin-bottom:18px;">
+        <div class="exp-card"><div class="ec-label">Total Budget</div><div class="ec-val" id="dashExpTotal">$0.00</div></div>
+        <div class="exp-card ec-paid"><div class="ec-label">Total Paid</div><div class="ec-val" id="dashExpPaid">$0.00</div></div>
+        <div class="exp-card ec-outstanding"><div class="ec-label">Outstanding</div><div class="ec-val" id="dashExpOutstanding">$0.00</div></div>
+      </div>
+
+      <!-- Row 3: Expense breakdown by category -->
+      <div class="dash-progress-sublabel">By Category</div>
+      <div id="dashExpCatSection"></div>
+    </div>
+
+  </div>
+
+  <!-- ===== EXPENSES VIEW ===== -->
+  <div id="view-expenses" style="display:none;">
+    <div class="exp-summary">
+      <div class="exp-card"><div class="ec-label">Total Budget</div><div class="ec-val" id="expTotal">$0.00</div></div>
+      <div class="exp-card ec-paid"><div class="ec-label">Total Paid</div><div class="ec-val" id="expPaid">$0.00</div></div>
+      <div class="exp-card ec-outstanding"><div class="ec-label">Outstanding</div><div class="ec-val" id="expOutstanding">$0.00</div></div>
+    </div>
+    <div class="toolbar" style="margin-bottom:16px;">
+      <div class="spacer"></div>
+      <button class="btn outline small" id="btnExportExpenses">Export to Excel</button>
+      <button class="btn small" id="btnAddExpense">+ Add Expense</button>
+    </div>
+    <div class="table-wrap">
+      <table style="min-width:1150px;">
+        <thead>
+          <tr>
+            <th class="no-sort">Vendor / Payee</th>
+            <th class="no-sort">Category</th>
+            <th class="no-sort">Linked Task</th>
+            <th class="no-sort">Total Cost</th>
+            <th class="no-sort">Paid</th>
+            <th class="no-sort">Deposit Date</th>
+            <th class="no-sort">Outstanding</th>
+            <th class="no-sort">Due Date</th>
+            <th class="no-sort">Status</th>
+            <th class="no-sort">Comments</th>
+            <th class="no-sort">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="expenseTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== NOTES VIEW ===== -->
+  <div id="view-notes" style="display:none;">
+    <div class="notes-wrap">
+      <div class="notes-toolbar">
+        <button class="notes-tool-btn" id="nBold" title="Bold"><b>B</b></button>
+        <button class="notes-tool-btn" id="nItalic" title="Italic"><i>I</i></button>
+        <button class="notes-tool-btn" id="nUnderline" title="Underline"><u>U</u></button>
+        <button class="notes-tool-btn" id="nStrike" title="Strikethrough"><s>S</s></button>
+        <div class="notes-tool-sep"></div>
+        <select class="notes-size-select" id="nFontSize" title="Text style">
+          <option value="p">Normal</option>
+          <option value="h3">Heading 3</option>
+          <option value="h2">Heading 2</option>
+          <option value="h1">Heading 1</option>
+        </select>
+        <div class="notes-tool-sep"></div>
+        <button class="notes-tool-btn" id="nUL" title="Bullet list" style="font-size:16px;">•</button>
+        <button class="notes-tool-btn" id="nOL" title="Numbered list" style="font-size:12px;">1.</button>
+        <div class="notes-tool-sep"></div>
+        <button class="notes-tool-btn" id="nCheckbox" title="Insert checkbox" style="font-size:15px;">☐</button>
+        <button class="notes-tool-btn" id="nTable" title="Insert table" style="font-size:13px;">⊞</button>
+        <button class="notes-tool-btn" id="nAttach" title="Attach file" style="font-size:14px;">📎</button>
+        <input type="file" id="notesFileInput" style="display:none;">
+      </div>
+      <div class="notes-editor" id="notesEditor" contenteditable="true" spellcheck="true"></div>
+      <div class="notes-footer" id="notesAutoSave">Notes auto-save as you type</div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN VIEW ===== -->
+  <div id="view-admin" style="display:none;">
+
+    <!-- ── Wedding Details ── -->
+    <div class="admin-section">
+      <h3>Wedding Details</h3>
+      <p class="admin-desc">Customise the couple name, wedding date, and timezone used for the countdown.</p>
+      <div class="admin-setting-row">
+        <label>Couple / Title</label>
+        <input type="text" id="adminCoupleTitle" placeholder="Angela &amp; Jeffrey">
+        <button class="btn small" id="btnSaveCoupleTitle">Save</button>
+      </div>
+      <div class="admin-setting-row">
+        <label>Wedding Date</label>
+        <input type="date" id="adminWeddingDate">
+        <button class="btn small" id="btnSaveWeddingDate">Save</button>
+      </div>
+      <div class="admin-setting-row">
+        <label>Timezone</label>
+        <select id="adminTimezone" style="max-width:280px;"></select>
+        <button class="btn small" id="btnSaveTimezone">Save</button>
+      </div>
+      <p class="admin-setting-note">Timezone determines which offset "midnight on the wedding date" is calculated from for the countdown.</p>
+    </div>
+
+    <!-- ── Site Logo ── -->
+    <div class="admin-section">
+      <h3>Site Logo</h3>
+      <p class="admin-desc">Upload a PNG, JPG, GIF or WebP logo (max 2 MB). It appears top-left of the header at up to 42 px tall — it will not shift the layout.</p>
+      <div class="admin-setting-row">
+        <img id="adminLogoPreview" style="max-height:42px;max-width:120px;object-fit:contain;display:none;border-radius:6px;border:1px solid var(--line);" alt="Logo preview">
+        <input type="file" id="adminLogoInput" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" style="display:none;">
+        <button class="btn small" id="btnUploadLogo">Upload Logo</button>
+        <button class="btn ghost small" id="btnRemoveLogo" style="display:none;">Remove</button>
+      </div>
+    </div>
+
+    <!-- ── Colour Palette ── -->
+    <div class="admin-section">
+      <h3>Colour Palette</h3>
+      <p class="admin-desc">Choose a colour scheme — applies instantly across the whole planner including charts.</p>
+      <div class="palette-grid" id="paletteGrid"></div>
+    </div>
+
+    <!-- ── Customisation ── -->
+    <div class="admin-section">
+      <h3>Customisation</h3>
+      <div class="admin-setting-row">
+        <label>Footer Text</label>
+        <input type="text" id="adminFooterText" placeholder="Made with care, for the big day">
+        <button class="btn small" id="btnSaveFooter">Save</button>
+      </div>
+      <div class="admin-setting-row">
+        <label>Calendar Reminder</label>
+        <span style="font-size:13px;">Show tasks due in the next</span>
+        <input type="number" id="adminReminderDays" min="1" max="365" style="width:72px;flex:none;">
+        <span style="font-size:13px;">days</span>
+        <button class="btn small" id="btnSaveReminderDays">Save</button>
+      </div>
+    </div>
+
+    <!-- ── Google Sheets Sync ── -->
+    <div class="admin-section">
+      <h3>Google Sheets Sync</h3>
+      <p class="admin-desc">Connect to a Google Apps Script Web App to sync your checklist across devices.</p>
+      <div class="admin-setting-row">
+        <label>Apps Script URL</label>
+        <input type="text" id="adminSyncUrl" placeholder="https://script.google.com/macros/s/…/exec" style="font-size:11px;">
+        <button class="btn small" id="btnSaveSyncUrl">Save &amp; Test</button>
+      </div>
+      <div id="adminSyncStatus"></div>
+      <div style="margin-top:12px;">
+        <button class="btn ghost small" id="btnDownloadTemplate">⬇ Download Spreadsheet Template</button>
+        <p class="admin-desc" style="margin-top:6px;">Downloads a blank XLSX with the correct sheet names and column headings. Upload it to Google Sheets, then deploy as a Web App to start syncing.</p>
+      </div>
+    </div>
+
+    <!-- ── Category Management ── -->
+    <div class="admin-section">
+      <h3>Category Management</h3>
+      <p class="admin-desc">Delete or rename categories. Tasks assigned to a deleted category will keep their existing value — only the category option is removed from dropdowns.</p>
+      <div class="cat-list" id="adminCatList"></div>
+      <div class="admin-add-cat">
+        <input type="text" id="adminNewCatInput" placeholder="New category name…" autocomplete="off">
+        <button class="btn small" id="btnAdminAddCat">+ Add Category</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<footer>Made with care, for the big day · 12.06.2027</footer>
+<footer id="siteFooter">Made with care, for the big day · 12.06.2027</footer>
 
 <!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="modalOverlay">
@@ -782,17 +1396,121 @@
   </div>
 </div>
 
+<!-- ===== EXPENSE MODAL ===== -->
+<div class="modal-overlay" id="expenseModalOverlay">
+  <div class="modal" style="max-width:520px;">
+    <h3 id="expenseModalTitle">Add Expense</h3>
+    <input type="hidden" id="expenseId">
+
+    <div class="field">
+      <label>Vendor / Payee</label>
+      <input type="text" id="fVendor" placeholder="e.g. Highline Venue">
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field">
+        <label>Category</label>
+        <select id="fExpenseCategory"></select>
+      </div>
+      <div class="field">
+        <label>Linked Task (optional)</label>
+        <select id="fLinkedTask"><option value="">None</option></select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field">
+        <label>Total Cost ($)</label>
+        <input type="number" id="fTotalCost" placeholder="0.00" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Deposit / Amount Paid ($)</label>
+        <input type="number" id="fDepositPaid" placeholder="0.00" min="0" step="0.01">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Outstanding (auto-calculated)</label>
+      <div class="exp-outstanding-display" id="fOutstanding">$0.00</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="field">
+        <label>Deposit Date</label>
+        <div class="date-field">
+          <input type="text" id="fDepositDateText" placeholder="DD/MM/YY" autocomplete="off">
+          <button type="button" class="cal-btn" id="fDepositDateBtn">📅</button>
+          <div class="date-popup" id="depositDatePopup">
+            <div class="dp-header">
+              <button type="button" id="ddpPrev">‹</button>
+              <span id="ddpTitle"></span>
+              <button type="button" id="ddpNext">›</button>
+            </div>
+            <div class="dp-grid" id="ddpGrid"></div>
+            <div class="dp-footer">
+              <button type="button" class="btn ghost small" id="ddpClear">Clear</button>
+              <button type="button" class="btn outline small" id="ddpToday">Today</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Payment Due Date</label>
+        <div class="date-field">
+          <input type="text" id="fPaymentDueDateText" placeholder="DD/MM/YY" autocomplete="off">
+          <button type="button" class="cal-btn" id="fPaymentDueDateBtn">📅</button>
+          <div class="date-popup" id="paymentDueDatePopup">
+            <div class="dp-header">
+              <button type="button" id="pdpPrev">‹</button>
+              <span id="pdpTitle"></span>
+              <button type="button" id="pdpNext">›</button>
+            </div>
+            <div class="dp-grid" id="pdpGrid"></div>
+            <div class="dp-footer">
+              <button type="button" class="btn ghost small" id="pdpClear">Clear</button>
+              <button type="button" class="btn outline small" id="pdpToday">Today</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Payment Status</label>
+      <select id="fExpenseStatus">
+        <option value="Unpaid">Unpaid</option>
+        <option value="Deposit Paid">Deposit Paid</option>
+        <option value="Fully Paid">Fully Paid</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Comments</label>
+      <textarea id="fExpenseComments" placeholder="Notes, booking references, etc…"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn danger" id="btnDeleteExpense" style="display:none;">Delete</button>
+      <div class="spacer"></div>
+      <button class="btn ghost" id="btnCancelExpense">Cancel</button>
+      <button class="btn" id="btnSaveExpense">Save Expense</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =========================================================
    DATA
    ========================================================= */
-const WEDDING_DATE = '2027-06-12';
+let WEDDING_DATE = '2027-06-12';
+let COUPLE_TITLE = 'Angela & Jeffrey';
+let WEDDING_TIMEZONE = '';
 
 /* ---- Configuration: edit these two values for your setup ---- */
 const SITE_PASSWORD = 'AHJL2027';
 // Paste the Web App URL from your deployed Google Apps Script here.
 // Leave as-is to run in local/offline mode (data won't sync across devices).
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsEju0GE2YvlGlHLFVxHH_LOr-K0Pv-jdAq1Kp9uTuID32Sd914rm5gJsp2mWHaDUb_A/exec';
+let APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsEju0GE2YvlGlHLFVxHH_LOr-K0Pv-jdAq1Kp9uTuID32Sd914rm5gJsp2mWHaDUb_A/exec';
 const LOCK_STORAGE_KEY = 'aj_wedding_unlocked';
 
 const DEFAULT_CATEGORIES = [
@@ -856,7 +1574,144 @@ let categories = [];
 let nextId = 1;
 let sortKey = 'dueDate';
 let sortDir = 'asc';
-let calYear, calMonth; // calMonth 0-indexed
+let calYear, calMonth;
+
+/* Multi-select filter state for Checklist tab */
+let filterCategories = new Set();
+let filterPriorities = new Set();
+let filterStatuses = new Set();
+
+/* Filter state for Dashboard tab */
+let dashFilterCategories = new Set();
+let dashFilterPriorities = new Set();
+
+/* Filter state for Budget section of Dashboard */
+let dashExpFilterCategories = new Set();
+
+/* Expenses */
+const EXPENSES_STORAGE_KEY = 'aj_wedding_expenses';
+let expenses = [];
+let nextExpenseId = 1;
+
+/* =========================================================
+   PALETTE & SETTINGS INFRASTRUCTURE
+   ========================================================= */
+const PALETTES = {
+  dustyBlue: { label:'Dusty Blue',  swatch:'#79B4DD', vars:{ '--sage':'#79B4DD','--sage-deep':'#4D86B8','--cream':'#F4F9FC','--cream-deep':'#E4F1FA','--blush':'#F6D0E0','--blush-deep':'#E090B5','--line':'#D8EAF7','--ink-soft':'#85A0B6','--color-complete':'#4F9272','--color-empty':'#D0DCE6' }},
+  sageGreen: { label:'Sage Green',  swatch:'#8BC4A0', vars:{ '--sage':'#8BC4A0','--sage-deep':'#5A9B78','--cream':'#F5FAF5','--cream-deep':'#E0F0E5','--blush':'#F8F0E3','--blush-deep':'#C4956A','--line':'#C8E8D0','--ink-soft':'#7DA08A','--color-complete':'#5A9B78','--color-empty':'#C8E8D0' }},
+  roseGold:  { label:'Rose Gold',   swatch:'#C9956A', vars:{ '--sage':'#C9956A','--sage-deep':'#A67450','--cream':'#FDF8F6','--cream-deep':'#F7EDE8','--blush':'#F9E8E4','--blush-deep':'#D9836E','--line':'#EDD8CC','--ink-soft':'#A07A6A','--color-complete':'#A67450','--color-empty':'#EDD8CC' }},
+  lavender:  { label:'Lavender',    swatch:'#9E91D0', vars:{ '--sage':'#9E91D0','--sage-deep':'#7264B8','--cream':'#F8F6FC','--cream-deep':'#EDE9F7','--blush':'#F5E6F7','--blush-deep':'#C49ACA','--line':'#DDD8F0','--ink-soft':'#8880A8','--color-complete':'#7264B8','--color-empty':'#DDD8F0' }},
+  blushPink: { label:'Blush Pink',  swatch:'#E8A4B8', vars:{ '--sage':'#E8A4B8','--sage-deep':'#C47A96','--cream':'#FDF6F8','--cream-deep':'#F8E8EE','--blush':'#FDE8D0','--blush-deep':'#D4906A','--line':'#F0D0DC','--ink-soft':'#A87A8A','--color-complete':'#C47A96','--color-empty':'#F0D0DC' }},
+  champagne: { label:'Champagne',   swatch:'#C4A882', vars:{ '--sage':'#C4A882','--sage-deep':'#9E8060','--cream':'#FBF8F4','--cream-deep':'#F3EDE4','--blush':'#F5E8D8','--blush-deep':'#B89070','--line':'#E5D8C4','--ink-soft':'#9A8870','--color-complete':'#9E8060','--color-empty':'#E5D8C4' }},
+};
+
+const TIMEZONES = [
+  { label:'UTC−12:00 (Baker Island)',       offset:'-12:00' },
+  { label:'UTC−8:00 (Los Angeles)',         offset:'-08:00' },
+  { label:'UTC−7:00 (Denver)',              offset:'-07:00' },
+  { label:'UTC−6:00 (Chicago)',             offset:'-06:00' },
+  { label:'UTC−5:00 (New York)',            offset:'-05:00' },
+  { label:'UTC−4:00 (Halifax)',             offset:'-04:00' },
+  { label:'UTC−3:00 (Buenos Aires)',        offset:'-03:00' },
+  { label:'UTC+0:00 (London)',              offset:'+00:00' },
+  { label:'UTC+1:00 (Paris / Berlin)',      offset:'+01:00' },
+  { label:'UTC+2:00 (Cairo / Athens)',      offset:'+02:00' },
+  { label:'UTC+3:00 (Moscow / Riyadh)',     offset:'+03:00' },
+  { label:'UTC+4:00 (Dubai)',               offset:'+04:00' },
+  { label:'UTC+5:30 (Mumbai / Delhi)',      offset:'+05:30' },
+  { label:'UTC+6:00 (Dhaka)',              offset:'+06:00' },
+  { label:'UTC+7:00 (Bangkok / Jakarta)',  offset:'+07:00' },
+  { label:'UTC+8:00 (Singapore / Perth)',  offset:'+08:00' },
+  { label:'UTC+9:00 (Tokyo / Seoul)',       offset:'+09:00' },
+  { label:'UTC+9:30 (Adelaide)',            offset:'+09:30' },
+  { label:'UTC+10:00 (Sydney / Brisbane)', offset:'+10:00' },
+  { label:'UTC+11:00 (Solomon Islands)',    offset:'+11:00' },
+  { label:'UTC+12:00 (Auckland / Fiji)',    offset:'+12:00' },
+];
+
+function detectLocalTimezone(){
+  const offset = -new Date().getTimezoneOffset();
+  const h = String(Math.floor(Math.abs(offset)/60)).padStart(2,'0');
+  const m = String(Math.abs(offset)%60).padStart(2,'0');
+  return (offset >= 0 ? '+' : '-') + h + ':' + m;
+}
+
+function applyPalette(key){
+  const palette = PALETTES[key] || PALETTES.dustyBlue;
+  const root = document.documentElement;
+  Object.entries(palette.vars).forEach(([k,v]) => root.style.setProperty(k, v));
+  document.querySelectorAll('.palette-swatch').forEach(el => {
+    el.classList.toggle('active', el.dataset.palette === key);
+  });
+}
+
+function applyWeddingDateDisplay(){
+  const [y,m,d] = WEDDING_DATE.split('-');
+  const formatted = d + ' · ' + m + ' · ' + y;
+  const dlEl = document.getElementById('weddingDateLine');
+  if (dlEl) dlEl.textContent = formatted;
+}
+
+function formatDateDisplay(iso){
+  const [y,m,d] = iso.split('-');
+  return d + '.' + m + '.' + y;
+}
+
+function loadSettings(){
+  const logo    = localStorage.getItem('aj_wedding_logo');
+  const title   = localStorage.getItem('aj_wedding_title');
+  const date    = localStorage.getItem('aj_wedding_date');
+  const tz      = localStorage.getItem('aj_wedding_timezone');
+  const palette = localStorage.getItem('aj_wedding_palette');
+  const footer  = localStorage.getItem('aj_wedding_footer');
+  const url     = localStorage.getItem('aj_apps_script_url');
+
+  if (title)   COUPLE_TITLE     = title;
+  if (date)    WEDDING_DATE     = date;
+  if (tz)      WEDDING_TIMEZONE = tz;
+  if (url)     APPS_SCRIPT_URL  = url;
+
+  const logoEl = document.getElementById('heroLogo');
+  if (logo && logoEl){ logoEl.src = logo; logoEl.style.display = 'block'; }
+
+  const titleEl = document.getElementById('heroTitle');
+  if (titleEl) titleEl.innerHTML = COUPLE_TITLE;
+
+  applyWeddingDateDisplay();
+  applyPalette(palette || 'dustyBlue');
+
+  const footerEl = document.getElementById('siteFooter');
+  if (footerEl){
+    const ft = footer || 'Made with care, for the big day';
+    footerEl.textContent = ft + ' · ' + formatDateDisplay(WEDDING_DATE);
+  }
+}
+
+function refreshDashExpCategoryFilterPanel(){
+  const body = document.getElementById('dfpExpCategoryBody');
+  if (!body) return;
+  body.innerHTML = '';
+  const expCats = [...new Set(expenses.map(e => e.category).filter(Boolean))].sort();
+  expCats.forEach(cat => {
+    const label = document.createElement('label');
+    label.className = 'filter-checkbox';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = cat;
+    cb.checked = dashExpFilterCategories.has(cat);
+    cb.addEventListener('change', () => {
+      if (cb.checked) dashExpFilterCategories.add(cat);
+      else dashExpFilterCategories.delete(cat);
+      updateFilterBadge('dfpExpCategory', dashExpFilterCategories.size);
+      renderDashboard();
+    });
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + cat));
+    body.appendChild(label);
+  });
+}
+
+/* Notes */
+const NOTES_STORAGE_KEY = 'aj_wedding_notes';
 
 /* =========================================================
    SYNC (Google Sheet via Apps Script Web App)
@@ -904,6 +1759,37 @@ async function loadData(){
       if (Array.isArray(data.categories) && data.categories.length){
         categories = data.categories.map(c=>c.toString());
       }
+      if (Array.isArray(data.expenses)){
+        expenses = data.expenses.map(e=>({
+          id:             Number(e.id)            || 0,
+          vendor:         String(e.vendor         || ''),
+          category:       String(e.category       || ''),
+          taskId:         e.taskId ? Number(e.taskId) : null,
+          totalCost:      Number(e.totalCost)     || 0,
+          depositPaid:    Number(e.depositPaid)   || 0,
+          depositDate:    String(e.depositDate    || ''),
+          paymentDueDate: String(e.paymentDueDate || ''),
+          status:         String(e.status         || ''),
+          comments:       String(e.comments       || '')
+        }));
+        nextExpenseId = expenses.reduce((m,e)=>Math.max(m,e.id), 0) + 1;
+      }
+      if (typeof data.notes === 'string'){
+        localStorage.setItem('aj_wedding_notes', data.notes);
+        const notesEl = document.getElementById('notesEditor');
+        if (notesEl) notesEl.innerHTML = data.notes;
+      }
+      if (data.settings && typeof data.settings === 'object'){
+        const s = data.settings;
+        const applyS = (key, val) => { if (val !== undefined && val !== '') localStorage.setItem(key, String(val)); };
+        applyS('aj_wedding_title',    s.aj_wedding_title);
+        applyS('aj_wedding_date',     s.aj_wedding_date);
+        applyS('aj_wedding_timezone', s.aj_wedding_timezone);
+        applyS('aj_wedding_palette',  s.aj_wedding_palette);
+        applyS('aj_wedding_footer',   s.aj_wedding_footer);
+        applyS('aj_reminder_days',    s.aj_reminder_days);
+        loadSettings();
+      }
       setSyncStatus('synced');
     }catch(e){
       setSyncStatus('offline');
@@ -941,7 +1827,19 @@ function saveData(){
       const res = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         headers: {'Content-Type': 'text/plain;charset=utf-8'},
-        body: JSON.stringify({tasks, categories})
+        body: (()=>{
+          const _notesEl = document.getElementById('notesEditor');
+          const _notes = _notesEl ? _notesEl.innerHTML : (localStorage.getItem('aj_wedding_notes') || '');
+          const _settings = {
+            aj_wedding_title:    COUPLE_TITLE,
+            aj_wedding_date:     WEDDING_DATE,
+            aj_wedding_timezone: WEDDING_TIMEZONE,
+            aj_wedding_palette:  localStorage.getItem('aj_wedding_palette')  || 'dustyBlue',
+            aj_wedding_footer:   localStorage.getItem('aj_wedding_footer')   || '',
+            aj_reminder_days:    localStorage.getItem('aj_reminder_days')    || '30',
+          };
+          return JSON.stringify({tasks, categories, expenses, notes: _notes, settings: _settings});
+        })()
       });
       if (!res.ok) throw new Error('Bad response');
       setSyncStatus('synced');
@@ -983,14 +1881,15 @@ function todayISO(){
    GENERIC DIALOG (replaces alert / confirm / prompt, which
    are blocked inside sandboxed preview frames)
    ========================================================= */
-const dialogOverlay = document.getElementById('dialogOverlay');
-const dialogTitle = document.getElementById('dialogTitle');
-const dialogMessage = document.getElementById('dialogMessage');
-const dialogInputWrap = document.getElementById('dialogInputWrap');
-const dialogInput = document.getElementById('dialogInput');
-const dialogActions = document.getElementById('dialogActions');
-
 function showDialog({title='', message='', input=false, inputValue='', placeholder='', buttons}){
+  /* Look up elements fresh each call — they live after the script tag in the DOM */
+  const dialogOverlay   = document.getElementById('dialogOverlay');
+  const dialogTitle     = document.getElementById('dialogTitle');
+  const dialogMessage   = document.getElementById('dialogMessage');
+  const dialogInputWrap = document.getElementById('dialogInputWrap');
+  const dialogInput     = document.getElementById('dialogInput');
+  const dialogActions   = document.getElementById('dialogActions');
+
   return new Promise(resolve=>{
     dialogTitle.textContent = title;
     dialogMessage.textContent = message;
@@ -1069,8 +1968,82 @@ function populateCategorySelect(selectEl, selectedValue, includeAll, includeAddN
 }
 
 function refreshAllCategoryDropdowns(){
-  populateCategorySelect(document.getElementById('filterCategory'), document.getElementById('filterCategory').value, true, false);
   populateCategorySelect(document.getElementById('fCategory'), document.getElementById('fCategory').value, false, true);
+  // Expense modal category select
+  const expCatSel = document.getElementById('fExpenseCategory');
+  if (expCatSel){
+    const prev = expCatSel.value;
+    expCatSel.innerHTML = '<option value="">— Select —</option>';
+    categories.forEach(c=>{
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      if (c === prev) opt.selected = true;
+      expCatSel.appendChild(opt);
+    });
+  }
+  refreshCategoryFilterPanel();
+  refreshDashCategoryFilterPanel();
+}
+
+function refreshCategoryFilterPanel(){
+  const body = document.getElementById('fpCategoryBody');
+  if (!body) return;
+  body.innerHTML = '';
+  categories.forEach(cat=>{
+    const label = document.createElement('label');
+    label.className = 'filter-checkbox';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = cat;
+    cb.checked = filterCategories.has(cat);
+    cb.addEventListener('change', ()=>{
+      if (cb.checked) filterCategories.add(cat);
+      else filterCategories.delete(cat);
+      updateFilterBadge('fpCategory', filterCategories.size);
+      renderTable();
+    });
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + cat));
+    body.appendChild(label);
+  });
+}
+
+function refreshDashCategoryFilterPanel(){
+  const body = document.getElementById('dfpCategoryBody');
+  if (!body) return;
+  body.innerHTML = '';
+  categories.forEach(cat=>{
+    const label = document.createElement('label');
+    label.className = 'filter-checkbox';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = cat;
+    cb.checked = dashFilterCategories.has(cat);
+    cb.addEventListener('change', ()=>{
+      if (cb.checked) dashFilterCategories.add(cat);
+      else dashFilterCategories.delete(cat);
+      updateFilterBadge('dfpCategory', dashFilterCategories.size);
+      renderDashboard();
+    });
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(' ' + cat));
+    body.appendChild(label);
+  });
+}
+
+function updateFilterBadge(panelId, count){
+  const badge = document.getElementById(panelId + 'Badge');
+  const header = document.getElementById(panelId + 'Btn');
+  if (!badge || !header) return;
+  if (count > 0){
+    badge.textContent = count;
+    badge.classList.add('visible');
+    header.classList.add('has-filters');
+  } else {
+    badge.textContent = '';
+    badge.classList.remove('visible');
+    header.classList.remove('has-filters');
+  }
 }
 
 document.getElementById('fCategory').addEventListener('change', (e)=>{
@@ -1093,14 +2066,10 @@ function priorityRank(p){ return {Low:1, Medium:2, High:3}[p] || 0; }
 function statusRank(s){ return {'Not Started':1, 'In Progress':2, 'Complete':3}[s] || 0; }
 
 function getFilteredSortedTasks(){
-  const fCat = document.getElementById('filterCategory').value;
-  const fPrio = document.getElementById('filterPriority').value;
-  const fStat = document.getElementById('filterStatus').value;
-
   let result = tasks.filter(t=>{
-    if (fCat && t.category !== fCat) return false;
-    if (fPrio && t.priority !== fPrio) return false;
-    if (fStat && t.status !== fStat) return false;
+    if (filterCategories.size > 0 && !filterCategories.has(t.category)) return false;
+    if (filterPriorities.size > 0 && !filterPriorities.has(t.priority)) return false;
+    if (filterStatuses.size > 0 && !filterStatuses.has(t.status)) return false;
     return true;
   });
 
@@ -1187,14 +2156,13 @@ document.querySelectorAll('thead th[data-sort]').forEach(th=>{
   });
 });
 
-['filterCategory','filterPriority','filterStatus'].forEach(id=>{
-  document.getElementById(id).addEventListener('change', renderTable);
-});
-
 document.getElementById('btnClearFilters').addEventListener('click', ()=>{
-  document.getElementById('filterCategory').value = '';
-  document.getElementById('filterPriority').value = '';
-  document.getElementById('filterStatus').value = '';
+  filterCategories.clear();
+  filterPriorities.clear();
+  filterStatuses.clear();
+  document.querySelectorAll('#fpCategoryBody input, #fpPriorityBody input, #fpStatusBody input')
+    .forEach(cb=>{ cb.checked = false; });
+  ['fpCategory','fpPriority','fpStatus'].forEach(id=> updateFilterBadge(id, 0));
   renderTable();
 });
 
@@ -1210,8 +2178,9 @@ function renderProgress(){
 }
 
 function renderCountdown(){
+  const tz = WEDDING_TIMEZONE || detectLocalTimezone();
   const now = new Date();
-  const wedding = new Date(WEDDING_DATE + 'T00:00:00');
+  const wedding = new Date(WEDDING_DATE + 'T00:00:00' + tz);
   let diffMs = wedding - now;
   const el = document.getElementById('countdown');
   if (diffMs < 0){
@@ -1424,6 +2393,30 @@ const completedDatePicker = createDatePicker({
 
 function closeDatePicker(){ dueDatePicker.close(); }
 function closeCompletedDatePicker(){ completedDatePicker.close(); }
+
+const depositDatePicker = createDatePicker({
+  input: document.getElementById('fDepositDateText'),
+  btn: document.getElementById('fDepositDateBtn'),
+  popup: document.getElementById('depositDatePopup'),
+  grid: document.getElementById('ddpGrid'),
+  title: document.getElementById('ddpTitle'),
+  prevBtn: document.getElementById('ddpPrev'),
+  nextBtn: document.getElementById('ddpNext'),
+  todayBtn: document.getElementById('ddpToday'),
+  clearBtn: document.getElementById('ddpClear')
+});
+
+const paymentDueDatePicker = createDatePicker({
+  input: document.getElementById('fPaymentDueDateText'),
+  btn: document.getElementById('fPaymentDueDateBtn'),
+  popup: document.getElementById('paymentDueDatePopup'),
+  grid: document.getElementById('pdpGrid'),
+  title: document.getElementById('pdpTitle'),
+  prevBtn: document.getElementById('pdpPrev'),
+  nextBtn: document.getElementById('pdpNext'),
+  todayBtn: document.getElementById('pdpToday'),
+  clearBtn: document.getElementById('pdpClear')
+});
 
 
 document.getElementById('btnSave').addEventListener('click', async ()=>{
@@ -1706,34 +2699,1007 @@ document.getElementById('todayMonth').addEventListener('click', ()=>{
 });
 
 /* =========================================================
+   FILTER PANELS INIT
+   ========================================================= */
+function initFilterPanels(){
+  // Checklist Priority checkboxes
+  document.querySelectorAll('#fpPriorityBody input').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if (cb.checked) filterPriorities.add(cb.value);
+      else filterPriorities.delete(cb.value);
+      updateFilterBadge('fpPriority', filterPriorities.size);
+      renderTable();
+    });
+  });
+  // Checklist Status checkboxes
+  document.querySelectorAll('#fpStatusBody input').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if (cb.checked) filterStatuses.add(cb.value);
+      else filterStatuses.delete(cb.value);
+      updateFilterBadge('fpStatus', filterStatuses.size);
+      renderTable();
+    });
+  });
+  // Dashboard Priority checkboxes
+  document.querySelectorAll('#dfpPriorityBody input').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      if (cb.checked) dashFilterPriorities.add(cb.value);
+      else dashFilterPriorities.delete(cb.value);
+      updateFilterBadge('dfpPriority', dashFilterPriorities.size);
+      renderDashboard();
+    });
+  });
+  document.getElementById('btnDashClearFilters').addEventListener('click', ()=>{
+    dashFilterCategories.clear();
+    dashFilterPriorities.clear();
+    document.querySelectorAll('#dfpCategoryBody input, #dfpPriorityBody input').forEach(cb=>{ cb.checked = false; });
+    ['dfpCategory','dfpPriority'].forEach(id=> updateFilterBadge(id, 0));
+    renderDashboard();
+  });
+
+  // Panel open/close for all filter panels
+  document.querySelectorAll('.filter-panel-header').forEach(header=>{
+    header.addEventListener('click', e=>{
+      e.stopPropagation();
+      const body = header.nextElementSibling;
+      const isOpen = body.classList.contains('open');
+      document.querySelectorAll('.filter-panel-body').forEach(b=>b.classList.remove('open'));
+      if (!isOpen) body.classList.add('open');
+    });
+  });
+  document.addEventListener('click', e=>{
+    if (!e.target.closest('.filter-panel')){
+      document.querySelectorAll('.filter-panel-body').forEach(b=>b.classList.remove('open'));
+    }
+  });
+}
+
+/* =========================================================
+   PIE CHART HELPERS
+   ========================================================= */
+function setPieChart(elId, segments){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const total = segments.reduce((s,seg)=>s+Math.max(0,seg.value),0);
+  if (!total){ el.style.background='var(--line)'; return; }
+  let deg = 0;
+  const stops = segments.map(seg=>{
+    const start = deg;
+    deg += (Math.max(0,seg.value)/total)*360;
+    return `${seg.color} ${start}deg ${deg}deg`;
+  });
+  el.style.background = `conic-gradient(${stops.join(', ')})`;
+}
+
+function renderPieLegend(elId, items){
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = items.map(item=>`
+    <div class="pie-legend-item">
+      <div class="pie-legend-dot" style="background:${item.color}"></div>
+      <span class="pie-legend-label">${item.label}</span>
+      <span class="pie-legend-val">${item.fmt ? fmtCurrency(item.value) : item.value}</span>
+    </div>`).join('');
+}
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+function renderDashboard(){
+  const filtered = tasks.filter(t=>{
+    if (dashFilterCategories.size > 0 && !dashFilterCategories.has(t.category)) return false;
+    if (dashFilterPriorities.size > 0 && !dashFilterPriorities.has(t.priority)) return false;
+    return true;
+  });
+  const total = filtered.length;
+  const complete = filtered.filter(t=>t.status==='Complete').length;
+  const inProg = filtered.filter(t=>t.status==='In Progress').length;
+  const notStart = filtered.filter(t=>t.status==='Not Started').length;
+  const pct = total ? Math.round((complete/total)*100) : 0;
+
+  document.getElementById('dashTotal').textContent = total;
+  document.getElementById('dashComplete').textContent = complete;
+  document.getElementById('dashInProgress').textContent = inProg;
+  document.getElementById('dashNotStarted').textContent = notStart;
+  document.getElementById('dashPct').textContent = pct + '%';
+
+  // Task completion pie chart
+  setPieChart('taskPieChart', [
+    {value:complete, color:'var(--color-complete)'},
+    {value:inProg,   color:'var(--sage)'},
+    {value:notStart, color:'var(--color-empty)'}
+  ]);
+  document.getElementById('taskPiePct').textContent = pct + '%';
+  renderPieLegend('taskPieLegend', [
+    {label:'Complete',    value:complete, color:'var(--color-complete)'},
+    {label:'In Progress', value:inProg,   color:'var(--sage)'},
+    {label:'Not Started', value:notStart, color:'var(--color-empty)'}
+  ]);
+
+  // By category
+  const catSection = document.getElementById('dashCatSection');
+  catSection.innerHTML = '';
+  const cats = [...new Set(filtered.map(t=>t.category).filter(Boolean))].sort();
+  if (!cats.length){
+    catSection.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;font-size:13px;">No tasks match filters.</p>';
+  } else {
+    cats.forEach(cat=>{
+      const ct = filtered.filter(t=>t.category===cat);
+      const done = ct.filter(t=>t.status==='Complete').length;
+      const p = Math.round((done/ct.length)*100);
+      catSection.insertAdjacentHTML('beforeend',`
+        <div class="dash-progress-row">
+          <div class="dash-progress-label">
+            <span title="${escapeHtml(cat)}">${escapeHtml(cat)}</span>
+            <span class="dash-progress-meta">${done}/${ct.length}</span>
+          </div>
+          <div class="dash-progress-track"><div class="dash-progress-fill" style="width:${p}%"></div></div>
+          <span class="dash-progress-pct">${p}%</span>
+        </div>`);
+    });
+  }
+
+  // By priority
+  const prioSection = document.getElementById('dashPrioSection');
+  prioSection.innerHTML = '';
+  ['High','Medium','Low'].forEach(prio=>{
+    const pt = filtered.filter(t=>t.priority===prio);
+    if (!pt.length) return;
+    const done = pt.filter(t=>t.status==='Complete').length;
+    const p = Math.round((done/pt.length)*100);
+    prioSection.insertAdjacentHTML('beforeend',`
+      <div class="dash-progress-row">
+        <div class="dash-progress-label">
+          <span><span class="pill prio-${prio.toLowerCase()}">${prio}</span></span>
+          <span class="dash-progress-meta">${done}/${pt.length}</span>
+        </div>
+        <div class="dash-progress-track"><div class="dash-progress-fill pf-${prio.toLowerCase()}" style="width:${p}%"></div></div>
+        <span class="dash-progress-pct">${p}%</span>
+      </div>`);
+  });
+
+  // Budget section — apply expense category filter
+  const filteredExp = dashExpFilterCategories.size > 0
+    ? expenses.filter(e => dashExpFilterCategories.has(e.category))
+    : expenses;
+  const totalBudget = filteredExp.reduce((s,e)=>s+(Number(e.totalCost)||0),0);
+  const totalPaid   = filteredExp.reduce((s,e)=>s+(Number(e.depositPaid)||0),0);
+  const totalOut    = filteredExp.reduce((s,e)=>s+Math.max(0,(Number(e.totalCost)||0)-(Number(e.depositPaid)||0)),0);
+  document.getElementById('dashExpTotal').textContent = fmtCurrency(totalBudget);
+  document.getElementById('dashExpPaid').textContent  = fmtCurrency(totalPaid);
+  document.getElementById('dashExpOutstanding').textContent = fmtCurrency(totalOut);
+
+  if (totalBudget > 0){
+    setPieChart('budgetPieChart', [
+      {value:totalPaid, color:'var(--color-complete)'},
+      {value:totalOut,  color:'var(--blush-deep)'}
+    ]);
+    const bPct = Math.round((totalPaid/totalBudget)*100);
+    document.getElementById('budgetPiePct').textContent = bPct + '%';
+    renderPieLegend('budgetPieLegend', [
+      {label:'Paid',        value:totalPaid, color:'var(--color-complete)', fmt:true},
+      {label:'Outstanding', value:totalOut,  color:'var(--blush-deep)',     fmt:true}
+    ]);
+  } else {
+    document.getElementById('budgetPiePct').textContent = '—';
+    document.getElementById('budgetPieLegend').innerHTML =
+      '<div style="color:var(--ink-soft);font-style:italic;font-size:13px;">Add expenses to see budget breakdown</div>';
+  }
+
+  // Expense breakdown by category (paid vs outstanding bars)
+  const expCatSec = document.getElementById('dashExpCatSection');
+  if (expCatSec){
+    expCatSec.innerHTML = '';
+    const expCats = [...new Set(filteredExp.map(e=>e.category).filter(Boolean))].sort();
+    if (expCats.length){
+      expCats.forEach(cat=>{
+        const ces = filteredExp.filter(e=>e.category===cat);
+        const paid = ces.reduce((s,e)=>s+(Number(e.depositPaid)||0),0);
+        const out  = ces.reduce((s,e)=>s+Math.max(0,(Number(e.totalCost)||0)-(Number(e.depositPaid)||0)),0);
+        const total = paid + out;
+        const p = total ? Math.round((paid/total)*100) : 0;
+        expCatSec.insertAdjacentHTML('beforeend',`
+          <div class="dash-progress-row">
+            <div class="dash-progress-label">
+              <span title="${escapeHtml(cat)}">${escapeHtml(cat)}</span>
+              <span class="dash-progress-meta">${fmtCurrency(paid)} / ${fmtCurrency(total)}</span>
+            </div>
+            <div class="dash-progress-track"><div class="dash-progress-fill" style="width:${p}%"></div></div>
+            <span class="dash-progress-pct">${p}%</span>
+          </div>`);
+      });
+    } else {
+      expCatSec.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;font-size:13px;">No expenses match filters.</p>';
+    }
+  }
+}
+
+/* =========================================================
+   CALENDAR UPCOMING TASKS
+   ========================================================= */
+function renderUpcoming(){
+  const listEl = document.getElementById('upcomingList');
+  if (!listEl) return;
+  const days = parseInt(localStorage.getItem('aj_reminder_days')) || 30;
+  const labelEl = document.getElementById('upcomingDaysLabel');
+  if (labelEl) labelEl.textContent = days;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const cutoff = new Date(today); cutoff.setDate(cutoff.getDate()+days);
+  const upcoming = tasks
+    .filter(t=>t.dueDate && t.status!=='Complete')
+    .filter(t=>{ const d=new Date(t.dueDate+'T00:00:00'); return d>=today && d<=cutoff; })
+    .sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+
+  if (!upcoming.length){
+    listEl.innerHTML = '<div class="upcoming-empty">No incomplete tasks due in the next ' + days + ' days 🎉</div>';
+  } else {
+    listEl.innerHTML = upcoming.map(t=>`
+      <div class="upcoming-item" data-task-id="${t.id}">
+        <span class="upcoming-date">${isoToDDMMYY(t.dueDate)}</span>
+        <span class="upcoming-desc">${escapeHtml(t.description)}</span>
+        <span class="pill prio-${t.priority.toLowerCase()}">${t.priority}</span>
+        <span class="pill cat">${escapeHtml(t.category||'')}</span>
+      </div>`).join('');
+    listEl.querySelectorAll('.upcoming-item').forEach(row=>{
+      row.addEventListener('click',()=>openModal(parseInt(row.dataset.taskId)));
+    });
+  }
+}
+
+document.getElementById('upcomingHeader').addEventListener('click', ()=>{
+  const list   = document.getElementById('upcomingList');
+  const header = document.getElementById('upcomingHeader');
+  list.classList.toggle('open');
+  header.classList.toggle('open');
+});
+
+/* =========================================================
+   EXPENSES
+   ========================================================= */
+function loadExpenses(){
+  if (expenses.length > 0) return; // server data already loaded — skip localStorage
+  try{
+    const stored = localStorage.getItem(EXPENSES_STORAGE_KEY);
+    if (stored){
+      expenses = JSON.parse(stored);
+      nextExpenseId = expenses.reduce((m,e)=>Math.max(m,e.id),0) + 1;
+    }
+  }catch(e){}
+}
+function saveExpenses(){
+  try{ localStorage.setItem(EXPENSES_STORAGE_KEY, JSON.stringify(expenses)); }catch(e){}
+  saveData(); // sync to Google Sheets when configured
+}
+
+function fmtCurrency(n){
+  return '$' + (Number(n)||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+}
+
+function renderExpenses(){
+  // Summary cards
+  const totalBudget = expenses.reduce((s,e)=>s+(Number(e.totalCost)||0),0);
+  const totalPaid = expenses.reduce((s,e)=>s+(Number(e.depositPaid)||0),0);
+  const totalOut = expenses.reduce((s,e)=>s+Math.max(0,(Number(e.totalCost)||0)-(Number(e.depositPaid)||0)),0);
+  document.getElementById('expTotal').textContent = fmtCurrency(totalBudget);
+  document.getElementById('expPaid').textContent = fmtCurrency(totalPaid);
+  document.getElementById('expOutstanding').textContent = fmtCurrency(totalOut);
+
+  const tbody = document.getElementById('expenseTableBody');
+  tbody.innerHTML = '';
+  if (!expenses.length){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="11">No expenses yet — click "+ Add Expense" to get started.</td></tr>`;
+    return;
+  }
+  expenses.forEach(exp=>{
+    const outstanding = Math.max(0,(Number(exp.totalCost)||0)-(Number(exp.depositPaid)||0));
+    const statClass = exp.status==='Fully Paid' ? 'status-complete' : exp.status==='Deposit Paid' ? 'status-in-progress' : 'status-not-started';
+    const linkedTask = tasks.find(t=>t.id===exp.taskId);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:500;">${escapeHtml(exp.vendor||'—')}</td>
+      <td><span class="pill cat">${escapeHtml(exp.category||'—')}</span></td>
+      <td class="comments">${linkedTask ? escapeHtml(linkedTask.description) : '<span style="color:var(--ink-soft)">—</span>'}</td>
+      <td>${fmtCurrency(exp.totalCost)}</td>
+      <td>${fmtCurrency(exp.depositPaid)}</td>
+      <td>${exp.depositDate ? isoToDDMMYY(exp.depositDate) : '<span style="color:var(--ink-soft)">—</span>'}</td>
+      <td style="color:${outstanding>0?'var(--blush-deep)':'#4F9272'};font-weight:500;">${fmtCurrency(outstanding)}</td>
+      <td>${exp.paymentDueDate ? isoToDDMMYY(exp.paymentDueDate) : '<span style="color:var(--ink-soft)">—</span>'}</td>
+      <td><span class="pill ${statClass}">${escapeHtml(exp.status||'Unpaid')}</span></td>
+      <td class="comments">${escapeHtml(exp.comments||'')}</td>
+      <td class="actions"><button class="btn ghost small" data-exp-edit="${exp.id}">Edit</button></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll('[data-exp-edit]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openExpenseModal(parseInt(btn.dataset.expEdit)));
+  });
+}
+
+function populateLinkedTaskSelect(selectedId){
+  const sel = document.getElementById('fLinkedTask');
+  sel.innerHTML = '<option value="">None</option>';
+  tasks.forEach(t=>{
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = t.description + (t.category ? ` (${t.category})` : '');
+    if (t.id === selectedId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function updateExpenseOutstanding(){
+  const total = parseFloat(document.getElementById('fTotalCost').value)||0;
+  const paid = parseFloat(document.getElementById('fDepositPaid').value)||0;
+  document.getElementById('fOutstanding').textContent = fmtCurrency(Math.max(0,total-paid));
+}
+
+function openExpenseModal(id){
+  const isEdit = !!id;
+  document.getElementById('expenseModalTitle').textContent = isEdit ? 'Edit Expense' : 'Add Expense';
+  document.getElementById('btnDeleteExpense').style.display = isEdit ? 'inline-block' : 'none';
+  document.getElementById('expenseId').value = id || '';
+
+  // Refresh category and task selects
+  const expCatSel = document.getElementById('fExpenseCategory');
+  expCatSel.innerHTML = '<option value="">— Select —</option>';
+  categories.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    expCatSel.appendChild(opt);
+  });
+
+  if (isEdit){
+    const exp = expenses.find(e=>e.id===id);
+    document.getElementById('fVendor').value = exp.vendor||'';
+    document.getElementById('fExpenseCategory').value = exp.category||'';
+    populateLinkedTaskSelect(exp.taskId||null);
+    document.getElementById('fLinkedTask').value = exp.taskId||'';
+    document.getElementById('fTotalCost').value = exp.totalCost||'';
+    document.getElementById('fDepositPaid').value = exp.depositPaid||'';
+    document.getElementById('fDepositDateText').value = exp.depositDate ? isoToDDMMYY(exp.depositDate) : '';
+    document.getElementById('fPaymentDueDateText').value = exp.paymentDueDate ? isoToDDMMYY(exp.paymentDueDate) : '';
+    document.getElementById('fExpenseStatus').value = exp.status||'Unpaid';
+    document.getElementById('fExpenseComments').value = exp.comments||'';
+  } else {
+    document.getElementById('fVendor').value = '';
+    document.getElementById('fExpenseCategory').value = '';
+    populateLinkedTaskSelect(null);
+    document.getElementById('fTotalCost').value = '';
+    document.getElementById('fDepositPaid').value = '';
+    document.getElementById('fDepositDateText').value = '';
+    document.getElementById('fPaymentDueDateText').value = '';
+    document.getElementById('fExpenseStatus').value = 'Unpaid';
+    document.getElementById('fExpenseComments').value = '';
+  }
+  updateExpenseOutstanding();
+  depositDatePicker.close();
+  paymentDueDatePicker.close();
+  document.getElementById('expenseModalOverlay').classList.add('open');
+}
+
+function closeExpenseModal(){
+  document.getElementById('expenseModalOverlay').classList.remove('open');
+  depositDatePicker.close();
+  paymentDueDatePicker.close();
+}
+
+document.getElementById('btnAddExpense').addEventListener('click', ()=> openExpenseModal(null));
+document.getElementById('btnCancelExpense').addEventListener('click', closeExpenseModal);
+document.getElementById('expenseModalOverlay').addEventListener('click', e=>{
+  if (e.target === document.getElementById('expenseModalOverlay')) closeExpenseModal();
+});
+
+['fTotalCost','fDepositPaid'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', updateExpenseOutstanding);
+});
+
+document.getElementById('btnSaveExpense').addEventListener('click', async ()=>{
+  const vendor = document.getElementById('fVendor').value.trim();
+  if (!vendor){ await showAlert('Please enter a vendor or payee name.','Missing vendor'); return; }
+  const totalCostRaw = document.getElementById('fTotalCost').value;
+  if (!totalCostRaw || isNaN(parseFloat(totalCostRaw))){ await showAlert('Please enter a valid total cost.','Missing cost'); return; }
+
+  const depositText = document.getElementById('fDepositDateText').value.trim();
+  let depositISO = '';
+  if (depositText){ const iso = ddmmyyToISO(depositText); if (iso===null){ await showAlert('Please enter deposit date as DD/MM/YY.','Invalid date'); return; } depositISO=iso; }
+
+  const dueText = document.getElementById('fPaymentDueDateText').value.trim();
+  let dueISO = '';
+  if (dueText){ const iso = ddmmyyToISO(dueText); if (iso===null){ await showAlert('Please enter due date as DD/MM/YY.','Invalid date'); return; } dueISO=iso; }
+
+  const id = document.getElementById('expenseId').value;
+  const taskIdVal = document.getElementById('fLinkedTask').value;
+  const data = {
+    vendor,
+    category: document.getElementById('fExpenseCategory').value,
+    taskId: taskIdVal ? parseInt(taskIdVal) : null,
+    totalCost: parseFloat(document.getElementById('fTotalCost').value)||0,
+    depositPaid: parseFloat(document.getElementById('fDepositPaid').value)||0,
+    depositDate: depositISO,
+    paymentDueDate: dueISO,
+    status: document.getElementById('fExpenseStatus').value,
+    comments: document.getElementById('fExpenseComments').value.trim()
+  };
+  if (id){
+    const exp = expenses.find(e=>e.id===parseInt(id));
+    Object.assign(exp, data);
+  } else {
+    expenses.push({id: nextExpenseId++, ...data});
+  }
+  saveExpenses();
+  closeExpenseModal();
+  renderExpenses();
+});
+
+document.getElementById('btnDeleteExpense').addEventListener('click', async ()=>{
+  const id = parseInt(document.getElementById('expenseId').value);
+  const ok = await showConfirm('This expense will be permanently removed.','Delete expense?');
+  if (!ok) return;
+  expenses = expenses.filter(e=>e.id!==id);
+  saveExpenses();
+  closeExpenseModal();
+  renderExpenses();
+});
+
+document.getElementById('btnExportExpenses').addEventListener('click', ()=>{
+  const data = expenses.map(exp=>{
+    const linkedTask = tasks.find(t=>t.id===exp.taskId);
+    return {
+      'Vendor / Payee': exp.vendor||'',
+      'Category': exp.category||'',
+      'Linked Task': linkedTask ? linkedTask.description : '',
+      'Total Cost': exp.totalCost||0,
+      'Deposit Paid': exp.depositPaid||0,
+      'Deposit Date': exp.depositDate ? new Date(exp.depositDate+'T00:00:00') : '',
+      'Outstanding': Math.max(0,(exp.totalCost||0)-(exp.depositPaid||0)),
+      'Payment Due Date': exp.paymentDueDate ? new Date(exp.paymentDueDate+'T00:00:00') : '',
+      'Status': exp.status||'',
+      'Comments': exp.comments||''
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(data, {cellDates:true});
+  ws['!cols'] = [{wch:22},{wch:20},{wch:30},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14},{wch:14},{wch:30}];
+  const dateCols=[5,7];
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let R=range.s.r+1; R<=range.e.r; R++){
+    dateCols.forEach(C=>{
+      const ref=XLSX.utils.encode_cell({r:R,c:C});
+      const cell=ws[ref];
+      if (cell && cell.t==='d') cell.z='dd/mm/yyyy';
+    });
+  }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Expenses');
+  XLSX.writeFile(wb, 'AHJL_Wedding_Expenses.xlsx');
+});
+
+/* =========================================================
+   NOTES
+   ========================================================= */
+function loadNotes(){
+  try{
+    const stored = localStorage.getItem(NOTES_STORAGE_KEY);
+    const editor = document.getElementById('notesEditor');
+    if (stored && editor) editor.innerHTML = stored;
+  }catch(e){}
+}
+
+function saveNotes(){
+  const editor = document.getElementById('notesEditor');
+  if (!editor) return;
+  const clone = editor.cloneNode(true);
+  clone.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    if (cb.checked) cb.setAttribute('checked','checked');
+    else cb.removeAttribute('checked');
+  });
+  try{
+    localStorage.setItem(NOTES_STORAGE_KEY, clone.innerHTML);
+    const footer = document.getElementById('notesAutoSave');
+    if (footer) footer.textContent = 'Saved · ' + new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    const footer = document.getElementById('notesAutoSave');
+    if (footer) footer.textContent = 'Save failed — storage may be full';
+  }
+  saveData();
+}
+
+let notesSaveTimer = null;
+function initNotesEditor(){
+  const editor = document.getElementById('notesEditor');
+  if (!editor) return;
+
+  try{ document.execCommand('defaultParagraphSeparator', false, 'p'); }catch(e){}
+
+  // Auto-save on text input
+  editor.addEventListener('input', ()=>{
+    clearTimeout(notesSaveTimer);
+    const footer = document.getElementById('notesAutoSave');
+    if (footer) footer.textContent = 'Saving…';
+    notesSaveTimer = setTimeout(saveNotes, 800);
+  });
+
+  // Save on checkbox click
+  editor.addEventListener('click', e=>{
+    if (e.target.type === 'checkbox'){
+      clearTimeout(notesSaveTimer);
+      notesSaveTimer = setTimeout(saveNotes, 300);
+    }
+  });
+
+  // Formatting helper (keeps editor focused)
+  function notesCmd(cmd, val){
+    editor.focus();
+    try{ document.execCommand(cmd, false, val||null); }catch(e){}
+  }
+
+  // ── Keyboard shortcuts ──
+  editor.addEventListener('keydown', e=>{
+    const mod = e.ctrlKey || e.metaKey;
+
+    // Auto-list: "- " → bullet, "1. " → numbered
+    if (e.key === ' '){
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount){
+        const node = sel.getRangeAt(0).startContainer;
+        const block = node.nodeType === 3 ? node.parentElement : node;
+        const txt = (block.textContent || '').trimEnd();
+        if (txt === '-'){
+          e.preventDefault();
+          block.textContent = '';
+          notesCmd('insertUnorderedList');
+          return;
+        }
+        if (/^\d+\.$/.test(txt)){
+          e.preventDefault();
+          block.textContent = '';
+          notesCmd('insertOrderedList');
+          return;
+        }
+      }
+    }
+
+    if (!mod) return;
+    // Ctrl/Cmd shortcuts
+    const key = e.key.toLowerCase();
+    const fmtMap = {b:'bold', i:'italic', u:'underline'};
+    if (fmtMap[key]){ e.preventDefault(); notesCmd(fmtMap[key]); return; }
+    if (e.shiftKey && key === 's'){ e.preventDefault(); notesCmd('strikeThrough'); }
+  });
+
+  // ── Toolbar buttons (mousedown to keep editor focus) ──
+  document.getElementById('nBold').addEventListener('mousedown',      e=>{ e.preventDefault(); notesCmd('bold'); });
+  document.getElementById('nItalic').addEventListener('mousedown',    e=>{ e.preventDefault(); notesCmd('italic'); });
+  document.getElementById('nUnderline').addEventListener('mousedown', e=>{ e.preventDefault(); notesCmd('underline'); });
+  document.getElementById('nStrike').addEventListener('mousedown',    e=>{ e.preventDefault(); notesCmd('strikeThrough'); });
+  document.getElementById('nUL').addEventListener('mousedown',        e=>{ e.preventDefault(); notesCmd('insertUnorderedList'); });
+  document.getElementById('nOL').addEventListener('mousedown',        e=>{ e.preventDefault(); notesCmd('insertOrderedList'); });
+
+  document.getElementById('nFontSize').addEventListener('change', function(){
+    editor.focus();
+    try{ document.execCommand('formatBlock', false, this.value); }catch(e){}
+    this.value = 'p';
+  });
+
+  // Checkbox — no placeholder text, cursor lands ready to type
+  document.getElementById('nCheckbox').addEventListener('mousedown', e=>{
+    e.preventDefault();
+    editor.focus();
+    const html = `<div class="note-check-item"><input type="checkbox">&nbsp;</div>`;
+    try{ document.execCommand('insertHTML', false, html); }catch(err){}
+  });
+
+  // Table — single "3x4" style prompt
+  document.getElementById('nTable').addEventListener('mousedown', async e=>{
+    e.preventDefault();
+    const raw = await showPrompt('Enter rows × columns (e.g. 3x4)', 'Insert Table', '3x4');
+    if (!raw) return;
+    const m = raw.match(/(\d+)[x×X,\s]+(\d+)/);
+    const rows = Math.min(20, Math.max(1, parseInt(m?.[1])||3));
+    const cols = Math.min(10, Math.max(1, parseInt(m?.[2])||3));
+    let html = '<table><thead><tr>';
+    for (let c=0;c<cols;c++) html += `<th>Heading ${c+1}</th>`;
+    html += '</tr></thead><tbody>';
+    for (let r=0;r<rows;r++){
+      html += '<tr>';
+      for (let c=0;c<cols;c++) html += '<td> </td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table><p></p>';
+    editor.focus();
+    try{ document.execCommand('insertHTML', false, html); }catch(err){}
+  });
+
+  // File attachment — opens in new tab instead of forcing download
+  document.getElementById('nAttach').addEventListener('click', ()=>{
+    document.getElementById('notesFileInput').click();
+  });
+  document.getElementById('notesFileInput').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 4*1024*1024){
+      showAlert('Files larger than 4 MB may exceed browser storage limits. Consider using a smaller file.', 'Large file');
+    }
+    const reader = new FileReader();
+    reader.onload = evt=>{
+      const dataUrl = evt.target.result;
+      const ext = file.name.split('.').pop().toLowerCase();
+      const isImage = ['jpg','jpeg','png','gif','webp','svg'].includes(ext);
+      editor.focus();
+      let html;
+      if (isImage){
+        html = `<img src="${dataUrl}" alt="${escapeHtml(file.name)}" style="max-width:100%;margin:6px 0;border-radius:6px;" contenteditable="false"><p></p>`;
+      } else {
+        html = `<a href="${dataUrl}" target="_blank" rel="noopener" class="note-attachment" contenteditable="false">📎 ${escapeHtml(file.name)}</a>`;
+      }
+      try{ document.execCommand('insertHTML', false, html); }catch(err){}
+      saveNotes();
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+}
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+function renderAdminPanel(){
+  const list = document.getElementById('adminCatList');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!categories.length){
+    list.innerHTML = '<p style="color:var(--ink-soft);font-style:italic;font-size:13px;">No categories yet.</p>';
+    return;
+  }
+  categories.forEach(cat=>{
+    const taskCount = tasks.filter(t=>t.category===cat).length;
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.innerHTML = `
+      <span class="cat-row-name">${escapeHtml(cat)}</span>
+      <span class="cat-row-count">${taskCount} task${taskCount!==1?'s':''}</span>
+      <button class="btn ghost small" data-rename="${escapeHtml(cat)}">Rename</button>
+      <button class="btn danger small" data-delete="${escapeHtml(cat)}">Delete</button>`;
+    list.appendChild(row);
+  });
+
+  list.querySelectorAll('[data-rename]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const old = btn.dataset.rename;
+      const newName = await showPrompt(`Rename "${old}" to:`, 'Rename Category', old);
+      if (!newName || newName === old) return;
+      if (categories.includes(newName)){
+        await showAlert(`"${newName}" already exists as a category.`, 'Duplicate');
+        return;
+      }
+      const idx = categories.indexOf(old);
+      if (idx >= 0) categories[idx] = newName;
+      tasks.forEach(t=>{ if (t.category===old) t.category=newName; });
+      categories.sort((a,b)=>a.localeCompare(b));
+      // Update filter state
+      if (filterCategories.has(old)){ filterCategories.delete(old); filterCategories.add(newName); }
+      if (dashFilterCategories.has(old)){ dashFilterCategories.delete(old); dashFilterCategories.add(newName); }
+      saveData();
+      refreshAllCategoryDropdowns();
+      renderAdminPanel();
+      renderTable();
+    });
+  });
+
+  list.querySelectorAll('[data-delete]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const cat = btn.dataset.delete;
+      const taskCount = tasks.filter(t=>t.category===cat).length;
+      const msg = taskCount > 0
+        ? `Delete "${cat}"? It is used by ${taskCount} task${taskCount!==1?'s':''}. Those tasks will keep their category value but it won't appear in dropdowns.`
+        : `Delete the category "${cat}"?`;
+      const ok = await showConfirm(msg, 'Delete Category?');
+      if (!ok) return;
+      categories = categories.filter(c=>c!==cat);
+      filterCategories.delete(cat);
+      dashFilterCategories.delete(cat);
+      updateFilterBadge('fpCategory', filterCategories.size);
+      updateFilterBadge('dfpCategory', dashFilterCategories.size);
+      saveData();
+      refreshAllCategoryDropdowns();
+      renderAdminPanel();
+      renderTable();
+    });
+  });
+}
+
+document.getElementById('btnAdminAddCat').addEventListener('click', async ()=>{
+  const input = document.getElementById('adminNewCatInput');
+  const name = input.value.trim();
+  if (!name){ await showAlert('Please enter a category name.','Missing name'); return; }
+  if (categories.includes(name)){ await showAlert(`"${name}" already exists.`,'Duplicate'); return; }
+  categories.push(name);
+  categories.sort((a,b)=>a.localeCompare(b));
+  input.value = '';
+  saveData();
+  refreshAllCategoryDropdowns();
+  renderAdminPanel();
+});
+
+/* =========================================================
    TABS
    ========================================================= */
+const ALL_VIEWS = ['checklist','calendar','dashboard','expenses','notes','admin'];
+
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    document.getElementById('btnAdminCog').classList.remove('active');
     const tab = btn.dataset.tab;
-    document.getElementById('view-checklist').style.display = tab === 'checklist' ? 'block' : 'none';
-    document.getElementById('view-calendar').style.display = tab === 'calendar' ? 'block' : 'none';
-    if (tab === 'calendar') renderCalendar();
+    ALL_VIEWS.forEach(v=>{
+      document.getElementById('view-'+v).style.display = tab===v ? 'block' : 'none';
+    });
+    if (tab==='checklist') renderTable();
+    if (tab==='calendar'){ renderUpcoming(); renderCalendar(); }
+    if (tab==='dashboard'){ refreshDashCategoryFilterPanel(); refreshDashExpCategoryFilterPanel(); renderDashboard(); }
+    if (tab==='expenses') renderExpenses();
+    if (tab==='notes') loadNotes();
   });
 });
+
+document.getElementById('btnAdminCog').addEventListener('click', ()=>{
+  const cog = document.getElementById('btnAdminCog');
+  const isActive = cog.classList.toggle('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if (isActive){
+    ALL_VIEWS.forEach(v=>{ document.getElementById('view-'+v).style.display = v==='admin' ? 'block' : 'none'; });
+    renderAdminPanel();
+  } else {
+    ALL_VIEWS.forEach(v=>{ document.getElementById('view-'+v).style.display = v==='dashboard' ? 'block' : 'none'; });
+    document.querySelector('.tab-btn[data-tab="dashboard"]').classList.add('active');
+    refreshDashCategoryFilterPanel();
+    refreshDashExpCategoryFilterPanel();
+    renderDashboard();
+  }
+});
+
+/* =========================================================
+   ADMIN SETTINGS
+   ========================================================= */
+function downloadSheetsTemplate(){
+  const wb = XLSX.utils.book_new();
+  const taskHeaders = [['id','description','category','dueDate','priority','status','comments','completedDate']];
+  const taskSheet = XLSX.utils.aoa_to_sheet(taskHeaders);
+  XLSX.utils.book_append_sheet(wb, taskSheet, 'Tasks');
+  const catHeaders = [['category']];
+  const catRows = DEFAULT_CATEGORIES.map(c=>[c]);
+  const catSheet = XLSX.utils.aoa_to_sheet([...catHeaders, ...catRows]);
+  XLSX.utils.book_append_sheet(wb, catSheet, 'Categories');
+  const expHeaders = [['id','vendor','category','taskId','totalCost','depositPaid','depositDate','paymentDueDate','status','comments']];
+  const expSheet = XLSX.utils.aoa_to_sheet(expHeaders);
+  XLSX.utils.book_append_sheet(wb, expSheet, 'Expenses');
+  const settingsRows = [
+    ['key','value'],
+    ['aj_wedding_title',    'Angela & Jeffrey'],
+    ['aj_wedding_date',     '2027-06-12'],
+    ['aj_wedding_timezone', '+10:00'],
+    ['aj_wedding_palette',  'dustyBlue'],
+    ['aj_wedding_footer',   'Made with care, for the big day'],
+    ['aj_reminder_days',    '30'],
+  ];
+  const settingsSheet = XLSX.utils.aoa_to_sheet(settingsRows);
+  XLSX.utils.book_append_sheet(wb, settingsSheet, 'Settings');
+  const notesSheet = XLSX.utils.aoa_to_sheet([['notes'],['']]);
+  XLSX.utils.book_append_sheet(wb, notesSheet, 'Notes');
+  XLSX.writeFile(wb, 'wedding-planner-template.xlsx');
+}
+
+function initAdminSettings(){
+  // Populate fields from current stored values
+  const titleEl = document.getElementById('adminCoupleTitle');
+  if (titleEl) titleEl.value = localStorage.getItem('aj_wedding_title') || COUPLE_TITLE;
+
+  const dateEl = document.getElementById('adminWeddingDate');
+  if (dateEl) dateEl.value = WEDDING_DATE;
+
+  const tzSel = document.getElementById('adminTimezone');
+  if (tzSel){
+    tzSel.innerHTML = '';
+    TIMEZONES.forEach(tz=>{
+      const opt = document.createElement('option');
+      opt.value = tz.offset; opt.textContent = tz.label;
+      tzSel.appendChild(opt);
+    });
+    const stored = localStorage.getItem('aj_wedding_timezone') || detectLocalTimezone();
+    const match = [...tzSel.options].find(o=>o.value===stored);
+    if (match) match.selected = true;
+  }
+
+  const footerEl = document.getElementById('adminFooterText');
+  if (footerEl) footerEl.value = localStorage.getItem('aj_wedding_footer') || '';
+
+  const daysEl = document.getElementById('adminReminderDays');
+  if (daysEl) daysEl.value = parseInt(localStorage.getItem('aj_reminder_days')) || 30;
+
+  const urlEl = document.getElementById('adminSyncUrl');
+  if (urlEl) urlEl.value = localStorage.getItem('aj_apps_script_url') || '';
+
+  // Palette swatches
+  const paletteGrid = document.getElementById('paletteGrid');
+  if (paletteGrid && !paletteGrid.hasChildNodes()){
+    const current = localStorage.getItem('aj_wedding_palette') || 'dustyBlue';
+    Object.entries(PALETTES).forEach(([key, p])=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'palette-swatch-wrap';
+      const sw = document.createElement('div');
+      sw.className = 'palette-swatch' + (key===current?' active':'');
+      sw.dataset.palette = key;
+      sw.style.background = p.swatch;
+      sw.title = p.label;
+      sw.addEventListener('click', ()=>{
+        localStorage.setItem('aj_wedding_palette', key);
+        applyPalette(key);
+        saveData();
+      });
+      const lbl = document.createElement('div');
+      lbl.className = 'palette-swatch-label';
+      lbl.textContent = p.label;
+      wrap.appendChild(sw); wrap.appendChild(lbl);
+      paletteGrid.appendChild(wrap);
+    });
+  }
+
+  // Logo
+  const storedLogo = localStorage.getItem('aj_wedding_logo');
+  const preview = document.getElementById('adminLogoPreview');
+  const removeBtn = document.getElementById('btnRemoveLogo');
+  if (storedLogo && preview){ preview.src=storedLogo; preview.style.display='block'; if(removeBtn) removeBtn.style.display=''; }
+
+  const uploadBtn = document.getElementById('btnUploadLogo');
+  const logoInput = document.getElementById('adminLogoInput');
+  if (uploadBtn && !uploadBtn._wired){
+    uploadBtn._wired = true;
+    uploadBtn.addEventListener('click', ()=> logoInput.click());
+    logoInput.addEventListener('change', e=>{
+      const file = e.target.files[0]; if (!file) return;
+      if (file.size > 2*1024*1024){ showAlert('Logo file must be under 2 MB.','Too large'); return; }
+      const reader = new FileReader();
+      reader.onload = evt=>{
+        const data = evt.target.result;
+        localStorage.setItem('aj_wedding_logo', data);
+        const logoEl = document.getElementById('heroLogo');
+        if (logoEl){ logoEl.src=data; logoEl.style.display='block'; }
+        if (preview){ preview.src=data; preview.style.display='block'; }
+        if (removeBtn) removeBtn.style.display='';
+      };
+      reader.readAsDataURL(file);
+    });
+    if (removeBtn) removeBtn.addEventListener('click', ()=>{
+      localStorage.removeItem('aj_wedding_logo');
+      const logoEl = document.getElementById('heroLogo');
+      if (logoEl){ logoEl.src=''; logoEl.style.display='none'; }
+      if (preview){ preview.src=''; preview.style.display='none'; }
+      removeBtn.style.display='none';
+    });
+  }
+
+  // Save handlers (guard with _wired to avoid duplicate listeners)
+  function wire(id, fn){
+    const el = document.getElementById(id);
+    if (el && !el._wired){ el._wired=true; el.addEventListener('click', fn); }
+  }
+
+  wire('btnSaveCoupleTitle', ()=>{
+    const val = document.getElementById('adminCoupleTitle').value.trim();
+    if (!val) return;
+    localStorage.setItem('aj_wedding_title', val);
+    COUPLE_TITLE = val;
+    const h = document.getElementById('heroTitle');
+    if (h) h.textContent = val;
+    showAlert('Couple name updated.', 'Saved');
+    saveData();
+  });
+
+  wire('btnSaveWeddingDate', ()=>{
+    const val = document.getElementById('adminWeddingDate').value;
+    if (!val) return;
+    localStorage.setItem('aj_wedding_date', val);
+    WEDDING_DATE = val;
+    applyWeddingDateDisplay();
+    renderCountdown();
+    const footerEl2 = document.getElementById('siteFooter');
+    const ft = localStorage.getItem('aj_wedding_footer') || 'Made with care, for the big day';
+    if (footerEl2) footerEl2.textContent = ft + ' · ' + formatDateDisplay(val);
+    showAlert('Wedding date updated.', 'Saved');
+    saveData();
+  });
+
+  wire('btnSaveTimezone', ()=>{
+    const val = document.getElementById('adminTimezone').value;
+    localStorage.setItem('aj_wedding_timezone', val);
+    WEDDING_TIMEZONE = val;
+    renderCountdown();
+    showAlert('Timezone saved.', 'Saved');
+    saveData();
+  });
+
+  wire('btnSaveFooter', ()=>{
+    const val = document.getElementById('adminFooterText').value.trim();
+    const ft = val || 'Made with care, for the big day';
+    localStorage.setItem('aj_wedding_footer', ft);
+    const footerEl2 = document.getElementById('siteFooter');
+    if (footerEl2) footerEl2.textContent = ft + ' · ' + formatDateDisplay(WEDDING_DATE);
+    showAlert('Footer text updated.', 'Saved');
+    saveData();
+  });
+
+  wire('btnSaveReminderDays', ()=>{
+    const val = parseInt(document.getElementById('adminReminderDays').value) || 30;
+    localStorage.setItem('aj_reminder_days', String(val));
+    showAlert('Reminder window set to ' + val + ' days.', 'Saved');
+    saveData();
+  });
+
+  wire('btnSaveSyncUrl', async ()=>{
+    const val = document.getElementById('adminSyncUrl').value.trim();
+    const statusEl = document.getElementById('adminSyncStatus');
+    localStorage.setItem('aj_apps_script_url', val);
+    APPS_SCRIPT_URL = val;
+    if (!val){ statusEl.textContent = 'Sync URL cleared.'; return; }
+    statusEl.textContent = 'Testing connection…';
+    try{
+      const res = await fetch(val, {method:'GET'});
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      statusEl.textContent = 'Connected. ' + (data.tasks ? data.tasks.length + ' tasks found.' : '');
+      await loadData();
+      refreshAllCategoryDropdowns();
+      renderTable();
+      renderDashboard();
+    } catch(e){
+      statusEl.textContent = 'Connection failed: ' + e.message;
+    }
+  });
+
+  wire('btnDownloadTemplate', downloadSheetsTemplate);
+
+  wire('btnDashExpClearFilters', ()=>{
+    dashExpFilterCategories.clear();
+    document.querySelectorAll('#dfpExpCategoryBody input').forEach(cb=>{ cb.checked=false; });
+    updateFilterBadge('dfpExpCategory', 0);
+    renderDashboard();
+  });
+}
 
 /* =========================================================
    INIT
    ========================================================= */
 async function init(){
-  await loadData();
-  refreshAllCategoryDropdowns();
-  renderTable();
-  renderCountdown();
-  setInterval(renderCountdown, 60000);
+  try {
+    loadSettings();
+    await loadData();
+    loadExpenses();
 
-  const now = new Date();
-  calYear = now.getFullYear();
-  calMonth = now.getMonth();
-  renderCalendarDow();
-  renderCalendar();
+    refreshAllCategoryDropdowns();
+    initFilterPanels();
+    initAdminSettings();
+
+    renderProgress();
+    renderCountdown();
+    setInterval(renderCountdown, 60000);
+
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    renderCalendarDow();
+
+    refreshDashCategoryFilterPanel();
+    refreshDashExpCategoryFilterPanel();
+    renderDashboard();
+
+    initNotesEditor();
+    loadNotes();
+  } catch(err) {
+    console.error('init() failed:', err);
+    var banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:9999;max-width:90vw;text-align:center;';
+    banner.textContent = 'App failed to load — please refresh. (' + (err && err.message ? err.message : String(err)) + ')';
+    document.body.appendChild(banner);
+  }
 }
 
 /* =========================================================
