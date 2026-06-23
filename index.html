@@ -1667,7 +1667,22 @@ function loadSettings(){
   const url     = localStorage.getItem('aj_apps_script_url');
 
   if (title)   COUPLE_TITLE     = title;
-  if (date)    WEDDING_DATE     = date;
+  if (date){
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)){
+      WEDDING_DATE = date;
+    } else {
+      // Corrupted date (e.g. stored as Date.toString()) — try to recover ISO format
+      const parsed = new Date(date);
+      if (!isNaN(parsed.getTime())){
+        const y  = parsed.getFullYear();
+        const mo = String(parsed.getMonth() + 1).padStart(2,'0');
+        const dy = String(parsed.getDate()).padStart(2,'0');
+        WEDDING_DATE = `${y}-${mo}-${dy}`;
+        localStorage.setItem('aj_wedding_date', WEDDING_DATE);
+      }
+      // If completely unparseable, keep the in-code default
+    }
+  }
   if (tz)      WEDDING_TIMEZONE = tz;
   if (url)     APPS_SCRIPT_URL  = url;
 
@@ -2183,6 +2198,7 @@ function renderCountdown(){
   const wedding = new Date(WEDDING_DATE + 'T00:00:00' + tz);
   let diffMs = wedding - now;
   const el = document.getElementById('countdown');
+  if (isNaN(diffMs)){ el.textContent = ''; return; }
   if (diffMs < 0){
     el.innerHTML = `<div class="chip"><div class="num">🎉</div><div class="lbl">Married!</div></div>`;
     return;
@@ -2253,7 +2269,6 @@ function closeModal(){
 
 document.getElementById('btnAddTask').addEventListener('click', ()=> openModal(null));
 document.getElementById('btnCancel').addEventListener('click', closeModal);
-overlay.addEventListener('click', (e)=>{ if (e.target === overlay) closeModal(); });
 
 // ===== Custom date picker (reusable for Due Date & Completed Date) =====
 const dueDateText = document.getElementById('fDueDateText');
@@ -3084,9 +3099,6 @@ function closeExpenseModal(){
 
 document.getElementById('btnAddExpense').addEventListener('click', ()=> openExpenseModal(null));
 document.getElementById('btnCancelExpense').addEventListener('click', closeExpenseModal);
-document.getElementById('expenseModalOverlay').addEventListener('click', e=>{
-  if (e.target === document.getElementById('expenseModalOverlay')) closeExpenseModal();
-});
 
 ['fTotalCost','fDepositPaid'].forEach(id=>{
   document.getElementById(id).addEventListener('input', updateExpenseOutstanding);
