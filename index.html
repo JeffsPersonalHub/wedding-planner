@@ -450,6 +450,7 @@
     padding:16px;
   }
   .modal-overlay.open{display:flex;}
+  #dialogOverlay{z-index:200;}
   .modal{
     background:var(--white);
     border-radius:var(--radius);
@@ -1749,16 +1750,28 @@ function setSyncStatus(state, detail){
   el.textContent = detail || labels[state] || '';
 }
 
+function sanitizeISODate(val){
+  if (!val) return '';
+  const s = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const m = s.match(/^(\d{4}-\d{2}-\d{2})[T ]/);
+  if (m) return m[1];
+  const d = new Date(s);
+  if (!isNaN(d.getTime()))
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return '';
+}
+
 function normalizeTask(t, fallbackId){
   return {
     id: Number(t.id) || fallbackId,
     description: (t.description ?? '').toString(),
     category: (t.category ?? '').toString(),
-    dueDate: (t.dueDate ?? '').toString(),
+    dueDate: sanitizeISODate(t.dueDate),
     priority: (t.priority ?? 'Medium').toString() || 'Medium',
     status: (t.status ?? 'Not Started').toString() || 'Not Started',
     comments: (t.comments ?? '').toString(),
-    completedDate: (t.completedDate ?? '').toString()
+    completedDate: sanitizeISODate(t.completedDate)
   };
 }
 
@@ -1782,8 +1795,8 @@ async function loadData(){
           taskId:         e.taskId ? Number(e.taskId) : null,
           totalCost:      Number(e.totalCost)     || 0,
           depositPaid:    Number(e.depositPaid)   || 0,
-          depositDate:    String(e.depositDate    || ''),
-          paymentDueDate: String(e.paymentDueDate || ''),
+          depositDate:    sanitizeISODate(e.depositDate),
+          paymentDueDate: sanitizeISODate(e.paymentDueDate),
           status:         String(e.status         || ''),
           comments:       String(e.comments       || '')
         }));
@@ -1803,6 +1816,9 @@ async function loadData(){
         applyS('aj_wedding_palette',  s.aj_wedding_palette);
         applyS('aj_wedding_footer',   s.aj_wedding_footer);
         applyS('aj_reminder_days',    s.aj_reminder_days);
+        applyS('aj_apps_script_url',  s.aj_apps_script_url);
+        const _syncedUrl = localStorage.getItem('aj_apps_script_url');
+        if (_syncedUrl) APPS_SCRIPT_URL = _syncedUrl;
         loadSettings();
       }
       setSyncStatus('synced');
@@ -1852,6 +1868,7 @@ function saveData(){
             aj_wedding_palette:  localStorage.getItem('aj_wedding_palette')  || 'dustyBlue',
             aj_wedding_footer:   localStorage.getItem('aj_wedding_footer')   || '',
             aj_reminder_days:    localStorage.getItem('aj_reminder_days')    || '30',
+            aj_apps_script_url:  APPS_SCRIPT_URL,
           };
           return JSON.stringify({tasks, categories, expenses, notes: _notes, settings: _settings});
         })()
@@ -1883,8 +1900,10 @@ function ddmmyyToISO(str){
 }
 // "YYYY-MM-DD" -> "DD/MM/YY"
 function isoToDDMMYY(iso){
-  if (!iso) return "";
-  const [y,m,d] = iso.split('-');
+  if (!iso) return '';
+  const dateOnly = iso.slice(0,10);
+  const [y,m,d] = dateOnly.split('-');
+  if (!y || !m || !d) return '';
   return `${d}/${m}/${y.slice(2)}`;
 }
 function todayISO(){
@@ -3486,9 +3505,9 @@ function downloadSheetsTemplate(){
   XLSX.utils.book_append_sheet(wb, expSheet, 'Expenses');
   const settingsRows = [
     ['key','value'],
-    ['aj_wedding_title',    'Angela & Jeffrey'],
-    ['aj_wedding_date',     '2027-06-12'],
-    ['aj_wedding_timezone', '+10:00'],
+    ['aj_wedding_title',    'Partner 1 & Partner 2'],
+    ['aj_wedding_date',     'YYYY-MM-DD'],
+    ['aj_wedding_timezone', '+00:00'],
     ['aj_wedding_palette',  'dustyBlue'],
     ['aj_wedding_footer',   'Made with care, for the big day'],
     ['aj_reminder_days',    '30'],
@@ -3528,7 +3547,7 @@ function initAdminSettings(){
   if (daysEl) daysEl.value = parseInt(localStorage.getItem('aj_reminder_days')) || 30;
 
   const urlEl = document.getElementById('adminSyncUrl');
-  if (urlEl) urlEl.value = localStorage.getItem('aj_apps_script_url') || '';
+  if (urlEl) urlEl.value = localStorage.getItem('aj_apps_script_url') || APPS_SCRIPT_URL;
 
   // Palette swatches
   const paletteGrid = document.getElementById('paletteGrid');
